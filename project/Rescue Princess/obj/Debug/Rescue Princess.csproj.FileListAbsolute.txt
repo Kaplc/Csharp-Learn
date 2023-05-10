@@ -1,0 +1,7 @@
+G:\project\Csharp-Learn\project\Rescue Princess\bin\Debug\Rescue_Princess.exe
+G:\project\Csharp-Learn\project\Rescue Princess\bin\Debug\Rescue_Princess.pdb
+G:\project\Csharp-Learn\project\Rescue Princess\obj\Debug\Rescue Princess.csproj.AssemblyReference.cache
+G:\project\Csharp-Learn\project\Rescue Princess\obj\Debug\Rescue Princess.csproj.SuggestedBindingRedirects.cache
+G:\project\Csharp-Learn\project\Rescue Princess\obj\Debug\Rescue Princess.csproj.CoreCompileInputs.cache
+G:\project\Csharp-Learn\project\Rescue Princess\obj\Debug\Rescue_Princess.exe
+G:\project\Csharp-Learn\project\Rescue Princess\obj\Debug\Rescue_Princess.pdb
