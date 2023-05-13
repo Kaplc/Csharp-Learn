@@ -122,6 +122,35 @@ namespace Rescue_Princess
                             
                         }
                         #endregion
+                
+                        #region 绘制玩家和boss
+                        // boss
+                        int bossX = 30;
+                        int bossY = 20;
+                        int bossHp = 100;
+                        int bossAtk = 10;
+                        Console.SetCursorPosition(bossX, bossY);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("★");
+                        // 玩家
+                        int playerX = 3;
+                        int playeY = 3;
+                        int playeHp = 100;
+                        int playeAtk = 10;
+                        Console.SetCursorPosition(playerX, playeY);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("●");
+                        // 提示信息
+                        Console.SetCursorPosition(2, windowHeight - 6);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("●:玩家  ");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("★:Boss");
+                        
+                        Console.SetCursorPosition(2, windowHeight - 5);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("请移动到boss身边按J进行攻击");
+                        #endregion
                         
                         
                         Console.ReadLine();
