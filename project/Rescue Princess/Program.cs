@@ -72,13 +72,12 @@ namespace Rescue_Princess
                                     if (selectNum == 1)
                                     {
                                         startIsTrue = true;
-                                        
                                     }
                                     else
                                     {
                                         Environment.Exit(0);
                                     }
-                                    
+
                                     break;
                             }
 
@@ -87,7 +86,6 @@ namespace Rescue_Princess
                                 sceneNum = 2;
                                 break;
                             }
-                            
                         }
 
                         #endregion
@@ -95,11 +93,40 @@ namespace Rescue_Princess
                         break;
                     case 2:
 
-                        #region 开始游戏
+                        #region 游戏场景
+                        Console.Clear(); // 清屏
+                        #region 画墙
+                        // 横墙
+                        for (int x = 0; x < windowWidth; x += 2)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            
+                            Console.SetCursorPosition(x, 0);
+                            Console.Write("■");
+                            Console.SetCursorPosition(x, windowHeight-1);
+                            Console.Write("■");
+                            Console.SetCursorPosition(x, windowHeight-7);
+                            Console.Write("■");
+                            
+                        }
+                        // 竖墙
+                        for (int y = 0; y < windowHeight -1 ; y++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            
+                            Console.SetCursorPosition(0, y);
+                            Console.Write("■");
+                            Console.SetCursorPosition(windowWidth-2, y);
+                            Console.Write("■");
 
-                        
-
+                            
+                        }
                         #endregion
+                        
+                        
+                        Console.ReadLine();
+                        #endregion
+
                         break;
                     case 3:
 
