@@ -94,36 +94,39 @@ namespace Rescue_Princess
                     case 2:
 
                         #region 游戏场景
+
                         Console.Clear(); // 清屏
+
                         #region 画墙
+
                         // 横墙
                         for (int x = 0; x < windowWidth; x += 2)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            
+
                             Console.SetCursorPosition(x, 0);
                             Console.Write("■");
-                            Console.SetCursorPosition(x, windowHeight-1);
+                            Console.SetCursorPosition(x, windowHeight - 1);
                             Console.Write("■");
-                            Console.SetCursorPosition(x, windowHeight-7);
+                            Console.SetCursorPosition(x, windowHeight - 7);
                             Console.Write("■");
-                            
                         }
+
                         // 竖墙
-                        for (int y = 0; y < windowHeight -1 ; y++)
+                        for (int y = 0; y < windowHeight - 1; y++)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            
+
                             Console.SetCursorPosition(0, y);
                             Console.Write("■");
-                            Console.SetCursorPosition(windowWidth-2, y);
+                            Console.SetCursorPosition(windowWidth - 2, y);
                             Console.Write("■");
-
-                            
                         }
+
                         #endregion
-                
+
                         #region 绘制玩家和boss
+
                         // boss
                         int bossX = 30;
                         int bossY = 20;
@@ -133,11 +136,11 @@ namespace Rescue_Princess
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write("★");
                         // 玩家
-                        int playerX = 3;
-                        int playeY = 3;
+                        int playerX = 4;
+                        int playerY = 4;
                         int playeHp = 100;
                         int playeAtk = 10;
-                        Console.SetCursorPosition(playerX, playeY);
+                        Console.SetCursorPosition(playerX, playerY);
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("●");
                         // 提示信息
@@ -146,14 +149,78 @@ namespace Rescue_Princess
                         Console.Write("●:玩家  ");
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write("★:Boss");
-                        
+
                         Console.SetCursorPosition(2, windowHeight - 5);
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("请移动到boss身边按J进行攻击");
+
                         #endregion
-                        
-                        
+
+                        #region 移动
+
+                        while (true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.SetCursorPosition(playerX, playerY);
+                            
+                            switch (Console.ReadKey(true).KeyChar)
+                            {
+                                case 'w':
+                                case 'W':
+                                    Console.Write("  ");
+                                    playerY--;
+                                    if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        playerX < 2 || playerY < 1 || playerX > windowWidth - 4 || playerY > windowHeight - 8)
+                                    {
+                                        playerY++;
+                                    }
+
+                                    break;
+                                case 'a':
+                                case 'A':
+                                    Console.Write("  ");
+                                    playerX -= 2;
+                                    if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        playerX < 2 || playerY < 1 || playerX > windowWidth - 4 || playerY > windowHeight - 8)
+                                    {
+                                        playerX += 2;
+                                    }
+
+                                    break;
+                                case 's':
+                                case 'S':
+                                    Console.Write("  ");
+                                    playerY++;
+                                    if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        playerX < 2 || playerY < 1 || playerX > windowWidth - 4 || playerY > windowHeight - 8)
+                                    {
+                                        playerY--;
+                                    }
+
+                                    break;
+                                case 'd':
+                                case 'D':
+                                    Console.Write("  ");
+                                    playerX += 2;
+                                    if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        playerX < 2 || playerY < 1 || playerX > windowWidth - 4 || playerY > windowHeight - 8)
+                                    {
+                                        playerX -= 2;
+                                    }
+
+                                    break;
+                            }
+                            
+                            Console.SetCursorPosition(playerX, playerY);
+                            Console.Write("●");
+                            
+                            
+                        }
+
+                        #endregion
+
                         Console.ReadLine();
+
                         #endregion
 
                         break;
