@@ -23,15 +23,16 @@ namespace Rescue_Princess
             #endregion
 
             int sceneNum = 1;
+            bool victory = false;
             // 游戏主循环
             while (true)
             {
                 switch (sceneNum)
                 {
                     case 1:
-
+                    
                         #region 开始场景
-
+                        Console.Clear();
                         bool startIsTrue = false;
                         int selectNum = 1;
                         int curX = windowWidth / 2 - 4;
@@ -133,8 +134,8 @@ namespace Rescue_Princess
                         int bossX = 30;
                         int bossY = 20;
                         int bossHp = 100;
-                        int bossAtkMax = 10;
-                        int bossAtkMin = 8;
+                        int bossAtkMax = 20;
+                        int bossAtkMin = 10;
                         Console.SetCursorPosition(bossX, bossY);
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write("★");
@@ -142,7 +143,7 @@ namespace Rescue_Princess
                         int playerX = 4;
                         int playerY = 4;
                         int playerHp = 100;
-                        int playerAtkMax = 12;
+                        int playerAtkMax = 20;
                         int playerAtkMin = 8;
                         bool atkState = false;
                         // 公主
@@ -254,17 +255,25 @@ namespace Rescue_Princess
                                                 int playerAtk = r.Next(playerAtkMin, playerAtkMax + 1);
                                                 bossHp -= playerAtk;
                                                 // 血量为负值置零
-                                                bossHp = bossHp < 0 ? 0 : bossHp;
+                                                if (bossHp < 0)
+                                                {
+                                                    bossHp = 0;
+                                                    break;
+                                                }
                                                 // 打印战斗信息
                                                 Console.SetCursorPosition(2, windowHeight - 4);
                                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                                 Console.WriteLine("你对Boss造成{0}点伤害, Boss剩余血量{1}     ", playerAtk,
                                                     bossHp);
-
+                                                
                                                 Thread.Sleep(500);
                                                 int bossAtk = r.Next(bossAtkMin, bossAtkMax + 1);
                                                 playerHp -= bossAtk;
-                                                playerHp = playerHp < 0 ? 0 : playerHp;
+                                                if (playerHp < 0)
+                                                {
+                                                    playerHp = 0;
+                                                    break;
+                                                }
 
                                                 Console.SetCursorPosition(2, windowHeight - 3);
                                                 Console.ForegroundColor = ConsoleColor.Green;
@@ -326,6 +335,7 @@ namespace Rescue_Princess
                                     )
                                     {
                                         sceneNum = 3;
+                                        victory = true;
                                     }
 
                                     #endregion
@@ -342,17 +352,76 @@ namespace Rescue_Princess
 
                         #endregion
 
+                        
+                        
+                        #endregion
+                        
+                        break;
+                    case 3:
+
+                        #region 结束场景
+
+                        Console.Clear();
+                        string title = "";
+                        title = victory ? "营救成功" : "营救失败";
+
+                        int ecurX = windowWidth / 2 - 4;
+                        int ecurY = windowHeight - 22;
+                        int eselectNum = 1;
+                        ConsoleColor restartTitle = ConsoleColor.Red;
+                        ConsoleColor eendTitle = ConsoleColor.White;
+                        // 打印标题
+                        Console.SetCursorPosition(ecurX, ecurY); // 移动光标
+                        Console.ForegroundColor = ConsoleColor.White; // 文字颜色
+                        Console.WriteLine(title);
+
+                        while (true)
+                        {
+                            Console.SetCursorPosition(ecurX-1, ecurY + 3); // 移动光标
+                            Console.ForegroundColor = restartTitle; // 文字颜色
+                            Console.WriteLine("返回主菜单");
+                            Console.SetCursorPosition(ecurX, ecurY + 5); // 移动光标
+                            Console.ForegroundColor = eendTitle; // 文字颜色
+                            Console.WriteLine("退出游戏");
+
+                            char key = Console.ReadKey(true).KeyChar;
+                            switch (key)
+                            {
+                                case 'w':
+                                case 'W':
+                                    eselectNum = 1;
+                                    restartTitle = ConsoleColor.Red; // 文字颜色
+                                    eendTitle = ConsoleColor.White;
+                                    break;
+                                case 's':
+                                case 'S':
+                                    eselectNum = 2;
+                                    restartTitle = ConsoleColor.White; // 文字颜色
+                                    eendTitle = ConsoleColor.Red;
+                                    break;
+                                case 'j':
+                                case 'J':
+                                    if (eselectNum == 1)
+                                    {
+                                        sceneNum = 1;
+                                        victory = false;
+                                    }
+                                    else
+                                    {
+                                        Environment.Exit(0);
+                                    }
+
+                                    break;
+                            }
+
+                            if (eselectNum == 1) break;
+                        }
+
                         #endregion
 
                         break;
-                    case 3:
-                        Console.Clear();
-                        Console.WriteLine("结束场景");
-                        break;
                 }
             }
-
-            Console.ReadLine();
         }
     }
 }
