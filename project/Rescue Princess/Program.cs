@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Rescue_Princess
 {
@@ -144,6 +145,9 @@ namespace Rescue_Princess
                         int playerAtkMax = 12;
                         int playerAtkMin = 8;
                         bool atkState = false;
+                        // 公主
+                        int princessX = 30;
+                        int princessY = 4;
                         Console.SetCursorPosition(playerX, playerY);
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("●");
@@ -174,9 +178,12 @@ namespace Rescue_Princess
                                     Console.Write("  ");
                                     playerY--;
                                     // 判断碰撞
-                                    if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
-                                        playerX < 2 || playerY < 1 || playerX > windowWidth - 4 ||
-                                        playerY > windowHeight - 8 || atkState == true)
+                                    if ((playerX == bossX && playerY == bossY && bossHp > 0) || // 禁止碰撞boss
+                                        (playerX == princessX && playerY == princessY && bossHp == 0) || // 禁止碰撞公主
+                                        (playerX < 2 || playerY < 1 || playerX > windowWidth - 4 ||
+                                         playerY > windowHeight - 8) || // 禁止碰撞墙体
+                                        atkState == true // 禁止战斗状态移动
+                                       )
                                     {
                                         playerY++;
                                     }
@@ -187,6 +194,7 @@ namespace Rescue_Princess
                                     Console.Write("  ");
                                     playerX -= 2;
                                     if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        (playerX == princessX && playerY == princessY && bossHp == 0) ||
                                         playerX < 2 || playerY < 1 || playerX > windowWidth - 4 ||
                                         playerY > windowHeight - 8 || atkState == true)
                                     {
@@ -199,6 +207,7 @@ namespace Rescue_Princess
                                     Console.Write("  ");
                                     playerY++;
                                     if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        (playerX == princessX && playerY == princessY && bossHp == 0) ||
                                         playerX < 2 || playerY < 1 || playerX > windowWidth - 4 ||
                                         playerY > windowHeight - 8 || atkState == true)
                                     {
@@ -211,6 +220,7 @@ namespace Rescue_Princess
                                     Console.Write("  ");
                                     playerX += 2;
                                     if ((playerX == bossX && playerY == bossY && bossHp > 0) ||
+                                        (playerX == princessX && playerY == princessY && bossHp == 0) ||
                                         playerX < 2 || playerY < 1 || playerX > windowWidth - 4 ||
                                         playerY > windowHeight - 8 || atkState == true)
                                     {
@@ -223,21 +233,22 @@ namespace Rescue_Princess
 
                                     #region 战斗
 
-                                    while (true)
+                                    if (
+                                        bossHp > 0 &&
+                                        ((playerX == bossX - 2 && playerY == bossY) ||
+                                         (playerX == bossX + 2 && playerY == bossY) ||
+                                         (playerX == bossX && playerY == bossY - 1) ||
+                                         (playerX == bossX && playerY == bossY + 1))
+                                    )
                                     {
-                                        if (bossHp > 0 &&
-                                            ((playerX == bossX - 2 && playerY == bossY) ||
-                                             (playerX == bossX + 2 && playerY == bossY) ||
-                                             (playerX == bossX && playerY == bossY - 1) ||
-                                             (playerX == bossX && playerY == bossY + 1))
-                                           )
+                                        atkState = true;
+                                        Console.SetCursorPosition(2, windowHeight - 5);
+                                        Console.ForegroundColor = ConsoleColor.Cyan;
+                                        Console.WriteLine("进入战斗状态,禁止移动!按J进行攻击");
+                                        while (true)
                                         {
-                                            atkState = true;
-                                            Console.SetCursorPosition(2, windowHeight - 5);
-                                            Console.ForegroundColor = ConsoleColor.Cyan;
-                                            Console.WriteLine("进入战斗状态,禁止移动!按J进行攻击");
-
                                             char key1 = Console.ReadKey(true).KeyChar;
+                                            // 按J进行战斗
                                             if (key1 == 'j' || key1 == 'J')
                                             {
                                                 int playerAtk = r.Next(playerAtkMin, playerAtkMax + 1);
@@ -249,11 +260,8 @@ namespace Rescue_Princess
                                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                                 Console.WriteLine("你对Boss造成{0}点伤害, Boss剩余血量{1}     ", playerAtk,
                                                     bossHp);
-                                            }
-                                            
-                                            char key2 = Console.ReadKey(true).KeyChar;
-                                            if (key2 == 'j' || key2 == 'J')
-                                            {
+
+                                                Thread.Sleep(500);
                                                 int bossAtk = r.Next(bossAtkMin, bossAtkMax + 1);
                                                 playerHp -= bossAtk;
                                                 playerHp = playerHp < 0 ? 0 : playerHp;
@@ -263,33 +271,69 @@ namespace Rescue_Princess
                                                 Console.WriteLine("Boss对你造成{0}点伤害, 你的剩余血量{1}      ", bossAtk, playerHp);
                                             }
 
+                                            // 判断是否结束战斗
+                                            if (playerHp == 0 || bossHp == 0)
+                                            {
+                                                atkState = false;
+                                                break;
+                                            }
                                         }
+                                    }
 
-                                        // 判断是否结束战斗
-                                        if (playerHp == 0)
-                                        {
-                                            sceneNum = 3;
-                                            break;
-                                        }
+                                    if (playerHp == 0)
+                                    {
+                                        sceneNum = 3;
+                                        break;
+                                    }
 
-                                        if (bossHp == 0)
-                                        {
-                                            // 删除boss
-                                            Console.SetCursorPosition(bossX, bossY);
-                                            Console.Write("  ");
-                                            
-                                            
-                                        }
-                                        
-                                        
-                                        
+                                    if (bossHp == 0)
+                                    {
+                                        // 打印提示信息
+                                        Console.SetCursorPosition(2, windowHeight - 6);
+                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                        Console.Write("●:玩家   ");
+                                        Console.ForegroundColor = ConsoleColor.Magenta;
+                                        Console.Write("¤:公主                                    ");
+
+                                        Console.SetCursorPosition(2, windowHeight - 5);
+                                        Console.ForegroundColor = ConsoleColor.Cyan;
+                                        Console.WriteLine("恭喜你打败了boss, 公主已经出现!                        ");
+                                        Console.SetCursorPosition(2, windowHeight - 4);
+                                        Console.ForegroundColor = ConsoleColor.White;
+                                        Console.WriteLine("按J营救公主                                         ");
+                                        Console.SetCursorPosition(2, windowHeight - 3);
+                                        Console.WriteLine("                                                   ");
+                                        Console.SetCursorPosition(2, windowHeight - 2);
+                                        Console.WriteLine("                                                   ");
+
+                                        // 删除boss
+                                        Console.SetCursorPosition(bossX, bossY);
+                                        Console.Write("  ");
+                                        // 打印公主
+                                        Console.SetCursorPosition(princessX, princessY);
+                                        Console.ForegroundColor = ConsoleColor.Magenta;
+                                        Console.Write("¤");
+                                        // 解除战斗状态
+                                        atkState = false;
+                                    }
+
+                                    if (
+                                        bossHp == 0 &&
+                                        ((playerX == princessX - 2 && playerY == princessY) ||
+                                         (playerX == princessX + 2 && playerY == princessY) ||
+                                         (playerX == princessX && playerY == princessY - 1) ||
+                                         (playerX == princessX && playerY == princessY + 1))
+                                    )
+                                    {
+                                        sceneNum = 3;
                                     }
 
                                     #endregion
+
                                     break;
                             }
 
-                            if (sceneNum == 3)break;
+                            if (sceneNum == 3) break;
 
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.SetCursorPosition(playerX, playerY);
