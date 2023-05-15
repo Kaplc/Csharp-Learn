@@ -1,0 +1,7 @@
+G:\project\Csharp-Learn\project\Flight chess\bin\Debug\Flight_chess.exe
+G:\project\Csharp-Learn\project\Flight chess\bin\Debug\Flight_chess.pdb
+G:\project\Csharp-Learn\project\Flight chess\obj\Debug\Flight chess.csproj.AssemblyReference.cache
+G:\project\Csharp-Learn\project\Flight chess\obj\Debug\Flight chess.csproj.SuggestedBindingRedirects.cache
+G:\project\Csharp-Learn\project\Flight chess\obj\Debug\Flight chess.csproj.CoreCompileInputs.cache
+G:\project\Csharp-Learn\project\Flight chess\obj\Debug\Flight_chess.exe
+G:\project\Csharp-Learn\project\Flight chess\obj\Debug\Flight_chess.pdb
