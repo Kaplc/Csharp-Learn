@@ -2,10 +2,16 @@
 
 namespace Flight_chess
 {
-    
+    enum E_SceneNum
+    {
+        StartScene = 1,
+        GameScene = 2,
+        EndScene = 3,
+    }
+
     internal class Program
     {
-        public static void init()
+        public static void InitConsole()
         {
             int windowsWilde = 60;
             int windowsHight = 30;
@@ -15,9 +21,10 @@ namespace Flight_chess
             Console.BufferHeight = windowsHight;
             Console.CursorVisible = false;
         }
+
         public static void Main(string[] args)
         {
-            init();
+            InitConsole();
             Console.WriteLine("按下任意键继续");
             Console.ReadLine();
         }
