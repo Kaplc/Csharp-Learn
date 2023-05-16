@@ -20,10 +20,71 @@ namespace Flight_chess
         EndScene,
     }
 
+    /// <summary>
+    /// 格子类型
+    /// </summary>
+    enum E_BlockType
+    {
+        Normal,
+        Pause,
+        Tunnel,
+        Boom
+    }
+
+    struct Position
+    {
+        public int x;
+        public int y;
+
+        public Position(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    struct Block
+    {
+        public E_BlockType type;
+        public Position position;
+
+        public Block(int x, int y, E_BlockType type)
+        {
+            this.position = new Position(x, y);
+            this.type = type;
+        }
+
+        public void Draw()
+        {
+            
+            Console.SetCursorPosition(this.position.x, this.position.y);
+            switch (type)
+            {
+                case E_BlockType.Normal:
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("□");
+                    break;
+                case E_BlockType.Boom:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("●");
+                    break;
+                case E_BlockType.Pause:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("×");
+                    break;
+                case E_BlockType.Tunnel:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("¤");
+                    break;
+            }
+            
+        }
+    }
+
     internal class Program
     {
         const int windowsWilde = 60;
-        const int windowsHight = 40;
+        const int windowsHight = 30;
 
         public static void InitConsole()
         {
@@ -140,7 +201,7 @@ namespace Flight_chess
 
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.SetCursorPosition(2, windowsHight - 9);
-            Console.Write("‖:暂停，一回合");
+            Console.Write("×:暂停，一回合");
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.SetCursorPosition(26, windowsHight - 9);
@@ -161,12 +222,12 @@ namespace Flight_chess
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.SetCursorPosition(22, windowsHight - 7);
             Console.Write("◎:玩家和电脑重合");
-            
+
             Console.ForegroundColor = ConsoleColor.White;
             Console.SetCursorPosition(2, windowsHight - 6);
             Console.Write("========================================================");
             Console.SetCursorPosition(2, windowsHight - 5);
-            Console.Write("按任意键开始扔色子");
+            Console.Write("按任意键开始扔骰子");
         }
 
         public static void GameScene()
