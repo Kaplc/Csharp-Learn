@@ -56,7 +56,6 @@ namespace Flight_chess
 
         public void Draw()
         {
-            
             Console.SetCursorPosition(this.position.x, this.position.y);
             switch (type)
             {
@@ -77,7 +76,91 @@ namespace Flight_chess
                     Console.Write("¤");
                     break;
             }
-            
+        }
+    }
+
+    struct Map
+    {
+        public Block[] blocks;
+
+        public Map(int a)
+        {
+            blocks = new Block[20 * 7 + 7];
+            Random r = new Random();
+            int x = 10;
+            int y = 3;
+            int index = 0;
+            bool dir = true; // 打印方向为true是x轴正方向
+
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                // 第一格必须是普通格子
+                if (i == 0)
+                {
+                    blocks[i] = new Block(x, y, E_BlockType.Normal);
+                    x += 2;
+                    index++;
+                    continue;
+                }
+
+                // 随机格子类型
+                int typeProbability = r.Next(0, 100);
+                E_BlockType blockType = E_BlockType.Normal;
+                if (typeProbability >= 70 && typeProbability < 80)
+                {
+                    blockType = E_BlockType.Boom;
+                }
+                else if (typeProbability >= 80 && typeProbability < 90)
+                {
+                    blockType = E_BlockType.Pause;
+                }
+                else if (typeProbability >= 90 && typeProbability < 100)
+                {
+                    blockType = E_BlockType.Tunnel;
+                }
+
+
+                if (dir == true && y < 16)
+                {
+                    index++;
+                    blocks[i] = new Block(x, y, blockType);
+                    if (index == 20)
+                    {
+                        y++;
+                        blocks[++i] = new Block(x, y, blockType);
+                        y++;
+                        dir = false;
+                        index = 0;
+                        continue;
+                    }
+                    x += 2;
+                }
+
+                if (dir == false && y < 16)
+                {
+                    index++;
+                    blocks[i] = new Block(x, y, blockType);
+                    if (index == 20)
+                    {
+                        y++;
+                        blocks[++i] = new Block(x, y, blockType);
+                        y++;
+                        dir = true;
+                        index = 0;
+                        continue;
+                    }
+                    x -= 2;
+                    
+                }
+            }
+        }
+
+        public void Draw()
+        {
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                blocks[i].Draw();
+            }
         }
     }
 
@@ -234,6 +317,8 @@ namespace Flight_chess
         {
             Console.Clear();
             DrawWalls();
+            Map map = new Map(1);
+            map.Draw();
             Console.ReadLine();
         }
 
