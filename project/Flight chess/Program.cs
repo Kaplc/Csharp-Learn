@@ -91,7 +91,7 @@ namespace Flight_chess
             int y = 3;
             int index = 0; // 当前打印第几个的格子索引
             bool dir = true; // 打印方向为true是x轴正方向
-            
+
             for (int i = 0; i < blocks.Length; i++)
             {
                 // 第一格必须是普通格子
@@ -136,6 +136,7 @@ namespace Flight_chess
                         index = 0; // 第几个的索引置零
                         continue;
                     }
+
                     // 下一个坐标
                     x += 2;
                 }
@@ -153,8 +154,8 @@ namespace Flight_chess
                         index = 0;
                         continue;
                     }
+
                     x -= 2;
-                    
                 }
             }
         }
@@ -173,18 +174,19 @@ namespace Flight_chess
         Player,
         AI,
     }
+
     struct Player
     {
         private E_PlayerType playerType; // 玩家类型
-        private int blockIndex; // 所在格子索引
+        public int blockIndex; // 所在格子索引
 
         Player(E_PlayerType playerType)
         {
             this.playerType = playerType;
             this.blockIndex = 0;
         }
-        
     }
+
     internal class Program
     {
         const int windowsWilde = 60;
@@ -334,10 +336,30 @@ namespace Flight_chess
             Console.Write("按任意键开始扔骰子");
         }
 
-        public static void DrawPlayer()
+        public static void DrawPlayer(Map map, Player player1, Player player2)
         {
-            
+            map.Draw();
+            int player1X = map.blocks[player1.blockIndex].position.x;
+            int player1Y = map.blocks[player1.blockIndex].position.y;
+            int player2X = map.blocks[player2.blockIndex].position.x;
+            int player2Y = map.blocks[player2.blockIndex].position.y;
+            if (player1.blockIndex == player2.blockIndex)
+            {
+                Console.SetCursorPosition(player1X, player1Y);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("◎");
+            }
+            else
+            {
+                Console.SetCursorPosition(player1X, player1Y);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("★");
+                Console.SetCursorPosition(player2X, player2Y);
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.Write("▲");
+            }
         }
+
         public static void GameScene()
         {
             Console.Clear();
