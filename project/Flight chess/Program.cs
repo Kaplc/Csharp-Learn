@@ -81,7 +81,7 @@ namespace Flight_chess
 
     struct Map
     {
-        public Block[] blocks;
+        public Block[] blocks; // 格子数组
 
         public Map(int a)
         {
@@ -89,9 +89,9 @@ namespace Flight_chess
             Random r = new Random();
             int x = 10;
             int y = 3;
-            int index = 0;
+            int index = 0; // 当前打印第几个的格子索引
             bool dir = true; // 打印方向为true是x轴正方向
-
+            
             for (int i = 0; i < blocks.Length; i++)
             {
                 // 第一格必须是普通格子
@@ -119,24 +119,28 @@ namespace Flight_chess
                     blockType = E_BlockType.Tunnel;
                 }
 
-
-                if (dir == true && y < 16)
+                // x正向打印
+                if (dir == true && y < a)
                 {
+                    // 记录第几个
                     index++;
                     blocks[i] = new Block(x, y, blockType);
+                    // 当生成到第20个时
                     if (index == 20)
                     {
+                        // 竖向打印一个
                         y++;
                         blocks[++i] = new Block(x, y, blockType);
-                        y++;
-                        dir = false;
-                        index = 0;
+                        y++; // 再下一行
+                        dir = false; // 改打印方向
+                        index = 0; // 第几个的索引置零
                         continue;
                     }
+                    // 下一个坐标
                     x += 2;
                 }
 
-                if (dir == false && y < 16)
+                if (dir == false && y < a)
                 {
                     index++;
                     blocks[i] = new Block(x, y, blockType);
@@ -164,6 +168,23 @@ namespace Flight_chess
         }
     }
 
+    enum E_PlayerType // 玩家类型枚举
+    {
+        Player,
+        AI,
+    }
+    struct Player
+    {
+        private E_PlayerType playerType; // 玩家类型
+        private int blockIndex; // 所在格子索引
+
+        Player(E_PlayerType playerType)
+        {
+            this.playerType = playerType;
+            this.blockIndex = 0;
+        }
+        
+    }
     internal class Program
     {
         const int windowsWilde = 60;
@@ -313,11 +334,15 @@ namespace Flight_chess
             Console.Write("按任意键开始扔骰子");
         }
 
+        public static void DrawPlayer()
+        {
+            
+        }
         public static void GameScene()
         {
             Console.Clear();
             DrawWalls();
-            Map map = new Map(1);
+            Map map = new Map(16);
             map.Draw();
             Console.ReadLine();
         }
