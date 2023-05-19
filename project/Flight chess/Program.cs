@@ -177,13 +177,15 @@ namespace Flight_chess
 
     struct Player
     {
-        private E_PlayerType playerType; // 玩家类型
+        public E_PlayerType playerType; // 玩家类型
         public int blockIndex; // 所在格子索引
+        public bool pause; // 判断暂停
 
-        Player(E_PlayerType playerType)
+        public Player(E_PlayerType playerType)
         {
             this.playerType = playerType;
             this.blockIndex = 0;
+            this.pause = false;
         }
     }
 
@@ -360,13 +362,136 @@ namespace Flight_chess
             }
         }
 
-        public static void GameScene()
+        public static int ThrowingDice(ref Player player1, ref Player player2, Map map)
+        {
+            if (player1.pause == true)
+            {
+                if (player1.playerType == E_PlayerType.Player)
+                {
+                    Console.SetCursorPosition(2, windowsHight - 5);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("你暂停一回合禁止移动,按任意键继续                   ");
+                }
+                else
+                {
+                    Console.SetCursorPosition(2, windowsHight - 5);
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine("AI暂停一回合禁止移动,按任意键继续                 ");
+                }
+
+                Console.SetCursorPosition(2, windowsHight - 4);
+                Console.WriteLine("                                           ");
+                player1.pause = false;
+                return 1;
+            }
+
+            Random r = new Random();
+            int num = r.Next(1, 7);
+            if (player1.playerType == E_PlayerType.Player)
+            {
+                Console.SetCursorPosition(2, windowsHight - 5);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("你投出了{0}点, 向前移动{1}格                            ", num, num);
+            }
+            else
+            {
+                Console.SetCursorPosition(2, windowsHight - 5);
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine("AI投出了{0}点, 向前移动{1}格                           ", num, num);
+            }
+
+            player1.blockIndex += num; // 移动
+            // 判断是否到终点
+            if (player1.blockIndex >= map.blocks.Length)
+            {
+                return -1;
+            }
+
+            E_BlockType blockType = map.blocks[player1.blockIndex].type;
+            switch (blockType)
+            {
+                case E_BlockType.Normal:
+                    Console.SetCursorPosition(2, windowsHight - 4);
+                    Console.WriteLine("到达安全位置, 按任意键继续                           ");
+                    break;
+                case E_BlockType.Boom:
+                    player1.blockIndex -= 5;
+                    // 倒退不能超过起点
+                    if (player1.blockIndex < 0)
+                    {
+                        player1.blockIndex = 0;
+                    }
+
+                    Console.SetCursorPosition(2, windowsHight - 4);
+                    Console.WriteLine("踩到炸弹倒退5格, 按任意键继续                           ");
+                    break;
+                case E_BlockType.Pause:
+                    player1.pause = true;
+                    Console.SetCursorPosition(2, windowsHight - 4);
+                    Console.WriteLine("暂停1回合, 按任意键继续                      ");
+                    break;
+                case E_BlockType.Tunnel:
+                    int tunnelNum = r.Next(1, 4);
+                    if (tunnelNum == 1)
+                    {
+                        player1.blockIndex -= 5;
+                        // 倒退不能超过起点
+                        if (player1.blockIndex < 0)
+                        {
+                            player1.blockIndex = 0;
+                        }
+
+                        Console.SetCursorPosition(2, windowsHight - 4);
+                        Console.WriteLine("随机中了倒退5格, 按任意键继续                        ");
+                    }
+                    else if (tunnelNum == 2)
+                    {
+                        player1.pause = true;
+                        Console.SetCursorPosition(2, windowsHight - 4);
+                        Console.WriteLine("随机中了暂停1回合, 按任意键继续                       ");
+                    }
+                    else
+                    {
+                        // 交换位置
+                        int player2Index = player2.blockIndex;
+                        player2.blockIndex = player1.blockIndex;
+                        player1.blockIndex = player2Index;
+                        Console.SetCursorPosition(2, windowsHight - 4);
+                        Console.WriteLine("随机中了交换双方位置, 按任意键继续                     ");
+                    }
+
+                    break;
+            }
+
+            return 1;
+        }
+
+        public static int GameScene()
         {
             Console.Clear();
-            DrawWalls();
+            DrawWalls(); // 画墙
             Map map = new Map(16);
-            map.Draw();
-            Console.ReadLine();
+            Player player1 = new Player(E_PlayerType.Player);
+            Player player2 = new Player(E_PlayerType.AI);
+            DrawPlayer(map, player1, player2);
+            while (true)
+            {
+                Console.ReadKey(true);
+                // 玩家扔骰子
+                if (ThrowingDice(ref player1, ref player2, map) == -1)
+                {
+                    return 0;
+                }
+                
+                DrawPlayer(map, player1, player2);
+                Console.ReadKey(true);
+                // AI扔骰子
+                if (ThrowingDice(ref player2, ref player1, map) == -1)
+                {
+                    return 0;
+                }
+                DrawPlayer(map, player1, player2);
+            }
         }
 
         public static void Main(string[] args)
@@ -381,7 +506,10 @@ namespace Flight_chess
                         StartScene(ref sceneType);
                         break;
                     case E_SceneType.GameScene:
-                        GameScene();
+                        if (GameScene()==0)
+                        {
+                            sceneType = E_SceneType.EndScene;
+                        }
                         break;
                     case E_SceneType.EndScene:
                         Console.WriteLine("结束场景");
