@@ -205,6 +205,7 @@ namespace Flight_chess
 
         public static void StartScene(ref E_SceneType sceneType)
         {
+            Console.Clear();
             int selectNum = 1;
             // 打印标题
             Console.SetCursorPosition(windowsWilde / 2 - 3, 8);
@@ -317,7 +318,7 @@ namespace Flight_chess
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.SetCursorPosition(2, windowsHight - 8);
-            Console.Write("¤:时空隧道，随机倒退，暂停，换位置");
+            Console.Write("¤:盲盒，随机倒退，暂停，换位置");
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.SetCursorPosition(2, windowsHight - 7);
@@ -370,13 +371,13 @@ namespace Flight_chess
                 {
                     Console.SetCursorPosition(2, windowsHight - 5);
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("你暂停一回合禁止移动,按任意键继续                   ");
+                    Console.WriteLine("你暂停一回合禁止移动,按任意键继续               ");
                 }
                 else
                 {
                     Console.SetCursorPosition(2, windowsHight - 5);
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine("AI暂停一回合禁止移动,按任意键继续                 ");
+                    Console.WriteLine("AI暂停一回合禁止移动,按任意键继续           ");
                 }
 
                 Console.SetCursorPosition(2, windowsHight - 4);
@@ -391,13 +392,13 @@ namespace Flight_chess
             {
                 Console.SetCursorPosition(2, windowsHight - 5);
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("你投出了{0}点, 向前移动{1}格                            ", num, num);
+                Console.WriteLine("你投出了{0}点, 向前移动{1}格                          ", num, num);
             }
             else
             {
                 Console.SetCursorPosition(2, windowsHight - 5);
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("AI投出了{0}点, 向前移动{1}格                           ", num, num);
+                Console.WriteLine("AI投出了{0}点, 向前移动{1}格                        ", num, num);
             }
 
             player1.blockIndex += num; // 移动
@@ -412,7 +413,7 @@ namespace Flight_chess
             {
                 case E_BlockType.Normal:
                     Console.SetCursorPosition(2, windowsHight - 4);
-                    Console.WriteLine("到达安全位置, 按任意键继续                           ");
+                    Console.WriteLine("到达安全位置, 按任意键继续                        ");
                     break;
                 case E_BlockType.Boom:
                     player1.blockIndex -= 5;
@@ -423,12 +424,12 @@ namespace Flight_chess
                     }
 
                     Console.SetCursorPosition(2, windowsHight - 4);
-                    Console.WriteLine("踩到炸弹倒退5格, 按任意键继续                           ");
+                    Console.WriteLine("踩到炸弹:倒退5格, 按任意键继续                       ");
                     break;
                 case E_BlockType.Pause:
                     player1.pause = true;
                     Console.SetCursorPosition(2, windowsHight - 4);
-                    Console.WriteLine("暂停1回合, 按任意键继续                      ");
+                    Console.WriteLine("踩到暂停:暂停1回合, 按任意键继续                      ");
                     break;
                 case E_BlockType.Tunnel:
                     int tunnelNum = r.Next(1, 4);
@@ -442,13 +443,13 @@ namespace Flight_chess
                         }
 
                         Console.SetCursorPosition(2, windowsHight - 4);
-                        Console.WriteLine("随机中了倒退5格, 按任意键继续                        ");
+                        Console.WriteLine("踩中了盲盒:倒退5格, 按任意键继续                     ");
                     }
                     else if (tunnelNum == 2)
                     {
                         player1.pause = true;
                         Console.SetCursorPosition(2, windowsHight - 4);
-                        Console.WriteLine("随机中了暂停1回合, 按任意键继续                       ");
+                        Console.WriteLine("踩中了盲盒:暂停1回合, 按任意键继续                    ");
                     }
                     else
                     {
@@ -457,7 +458,7 @@ namespace Flight_chess
                         player2.blockIndex = player1.blockIndex;
                         player1.blockIndex = player2Index;
                         Console.SetCursorPosition(2, windowsHight - 4);
-                        Console.WriteLine("随机中了交换双方位置, 按任意键继续                     ");
+                        Console.WriteLine("踩中了盲盒:交换双方位置, 按任意键继续               ");
                     }
 
                     break;
@@ -466,7 +467,7 @@ namespace Flight_chess
             return 1;
         }
 
-        public static int GameScene()
+        public static bool GameScene()
         {
             Console.Clear();
             DrawWalls(); // 画墙
@@ -480,17 +481,96 @@ namespace Flight_chess
                 // 玩家扔骰子
                 if (ThrowingDice(ref player1, ref player2, map) == -1)
                 {
-                    return 0;
+                    return true; // 玩家胜利返回1
                 }
-                
+
                 DrawPlayer(map, player1, player2);
                 Console.ReadKey(true);
                 // AI扔骰子
                 if (ThrowingDice(ref player2, ref player1, map) == -1)
                 {
-                    return 0;
+                    return false; // AI胜利返回2
                 }
+
                 DrawPlayer(map, player1, player2);
+            }
+        }
+
+        public static void EndScene(ref E_SceneType sceneType, bool winer)
+        {
+            Console.Clear();
+            int selectNum = 1;
+            // 打印标题
+            string gameOverTitle = "";
+            gameOverTitle = winer ? "你赢了, 你到达了终点" : "你输了,AI到达了终点";
+            Console.SetCursorPosition(windowsWilde / 2 - 10, 8);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(gameOverTitle);
+
+            ConsoleColor firstSelect = ConsoleColor.Red;
+            ConsoleColor secondSelect = ConsoleColor.White;
+
+            // 处理选择
+            while (true)
+            {
+                Console.SetCursorPosition(windowsWilde / 2 - 5, 12);
+                Console.ForegroundColor = firstSelect;
+                if (selectNum == 1)
+                {
+                    Console.Write("返回主菜单 ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("←");
+                }
+                else
+                {
+                    Console.WriteLine("返回主菜单      ");
+                }
+
+                Console.SetCursorPosition(windowsWilde / 2 - 4, 14);
+                Console.ForegroundColor = secondSelect;
+                if (selectNum == 2)
+                {
+                    Console.Write("退出游戏 ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("←");
+                }
+                else
+                {
+                    Console.WriteLine("退出游戏      ");
+                }
+
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.W:
+                        if (selectNum == 1)
+                        {
+                            break;
+                        }
+
+                        selectNum = 1;
+                        firstSelect = ConsoleColor.Red;
+                        secondSelect = ConsoleColor.White;
+                        break;
+                    case ConsoleKey.S:
+                        if (selectNum == 2)
+                        {
+                            break;
+                        }
+
+                        selectNum = 2;
+                        firstSelect = ConsoleColor.White;
+                        secondSelect = ConsoleColor.Red;
+                        break;
+                    case ConsoleKey.J:
+                        if (selectNum == 1)
+                        {
+                            sceneType = E_SceneType.StartScene;
+                            return;
+                        }
+
+                        Environment.Exit(0);
+                        break;
+                }
             }
         }
 
@@ -498,6 +578,7 @@ namespace Flight_chess
         {
             InitConsole();
             E_SceneType sceneType = E_SceneType.StartScene;
+            bool winer = true; // 胜利者true为玩家
             while (true)
             {
                 switch (sceneType)
@@ -506,13 +587,11 @@ namespace Flight_chess
                         StartScene(ref sceneType);
                         break;
                     case E_SceneType.GameScene:
-                        if (GameScene()==0)
-                        {
-                            sceneType = E_SceneType.EndScene;
-                        }
+                        winer = GameScene();
+                        sceneType = E_SceneType.EndScene;
                         break;
                     case E_SceneType.EndScene:
-                        Console.WriteLine("结束场景");
+                        EndScene(ref sceneType, winer);
                         break;
                 }
             }
