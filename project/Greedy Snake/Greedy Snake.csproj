@@ -44,6 +44,7 @@
         <Compile Include="src\game\Game.cs" />
         <Compile Include="src\game\GameEnum.cs" />
         <Compile Include="src\game\GameIntface.cs" />
+        <Compile Include="src\game\GameObject.cs" />
         <Compile Include="src\game\GameStruct.cs" />
     </ItemGroup>
     <ItemGroup>

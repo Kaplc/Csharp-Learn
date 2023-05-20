@@ -10,6 +10,7 @@ namespace Greedy_Snake
         public static void Main(string[] args)
         {
             Game game = new Game(90,30);
+            game.StartGame();
         }
     }
 }

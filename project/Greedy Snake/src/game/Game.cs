@@ -9,7 +9,7 @@ namespace Greedy_Snake.game
     {
         private int windowWide;
         private int windowHight;
-        public E_SceneType sceneType;
+        private E_SceneType sceneType;
 
         public Game(int windowWide, int windowHight)
         {
@@ -17,7 +17,6 @@ namespace Greedy_Snake.game
             this.windowHight = windowHight;
             sceneType = E_SceneType.Start;
             InitConsole();
-            StartGame();
         }
 
         private void InitConsole()
@@ -29,7 +28,7 @@ namespace Greedy_Snake.game
             Console.CursorVisible = false;
         }
 
-        private void StartGame()
+        public void StartGame()
         {
             while (true)
             {
@@ -61,13 +60,12 @@ namespace Greedy_Snake.game
     /// </summary>
     class StartEndSceneBase : I_UpdateGameImage
     {
-        protected E_SceneType currSceneType;
         protected string title;
         protected string firstSelect;
         protected string secondSelect;
         int selectNum = 1; // 默认选择第一个选项
 
-        public StartEndSceneBase()
+        protected StartEndSceneBase()
         {
             // this.currSceneType = currSceneType;
             title = "";
