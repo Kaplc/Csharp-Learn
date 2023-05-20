@@ -21,9 +21,9 @@ namespace Greedy_Snake.game
 
         private void InitConsole()
         {
-            Console.WindowWidth = windowWide;
+            Console.WindowWidth = windowWide + 1;
             Console.WindowHeight = windowHight;
-            Console.BufferWidth = windowWide;
+            Console.BufferWidth = windowWide + 1;
             Console.BufferHeight = windowHight;
             Console.CursorVisible = false;
         }
@@ -39,7 +39,8 @@ namespace Greedy_Snake.game
                         startScene.UpdateGameImage(windowWide, windowHight, ref sceneType);
                         break;
                     case E_SceneType.Game:
-                        Console.WriteLine("游戏场景");
+                        GameScene gameScene = new GameScene(windowWide, windowHight);
+                        gameScene.UpdateGameImage(windowWide, windowHight, ref sceneType);
                         break;
                     case E_SceneType.End:
                         EndScene endScene = new EndScene();
@@ -58,7 +59,7 @@ namespace Greedy_Snake.game
     /// <summary>
     /// 开始结束场景基类
     /// </summary>
-    class StartEndSceneBase : I_UpdateGameImage
+    abstract class StartEndSceneBase : I_UpdateGameImage
     {
         protected string title;
         protected string firstSelect;
@@ -72,8 +73,8 @@ namespace Greedy_Snake.game
             firstSelect = "";
             secondSelect = "";
         }
-        
-        public void UpdateGameImage(int w, int h,ref E_SceneType currSceneType)
+
+        public void UpdateGameImage(int w, int h, ref E_SceneType currSceneType)
         {
             Console.Clear();
             Console.SetCursorPosition(w / 2 - 4, h / 4);
@@ -159,7 +160,6 @@ namespace Greedy_Snake.game
             firstSelect = "开始游戏";
             secondSelect = "退出游戏";
         }
-        
     }
 
     /// <summary>
@@ -173,6 +173,27 @@ namespace Greedy_Snake.game
             firstSelect = "返回菜单";
             secondSelect = "退出游戏";
         }
-        
+    }
+
+    /// <summary>
+    /// 游戏场景类
+    /// </summary>
+    class GameScene : I_UpdateGameImage
+    {
+        public Map map;
+        public Food food;
+        public Snake snake;
+
+        public GameScene(int w, int h)
+        {
+            map = new Map(w, h);
+        }
+
+        public void UpdateGameImage(int w, int h, ref E_SceneType currSceneType)
+        {
+            Console.Clear();
+            map.Draw();
+            Console.ReadLine();
+        }
     }
 }

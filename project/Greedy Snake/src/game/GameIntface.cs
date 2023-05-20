@@ -5,7 +5,7 @@ namespace Greedy_Snake.game
         void UpdateGameImage(int w, int y, ref E_SceneType currSceneType);
     }
 
-    public interface I_DrawObject
+    public interface I_Draw
     {
         void Draw();
     }
