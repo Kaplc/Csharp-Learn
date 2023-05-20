@@ -53,4 +53,29 @@ namespace Greedy_Snake.game
             this.sceneType = changeSceneType;
         }
     }
+
+    /// <summary>
+    /// 开始结束场景基类
+    /// </summary>
+    class StartEndSceneBase : I_UpdateGameImage
+    {
+
+        private E_SceneType currSceneType;
+        private string title;
+        private string firstSelect;
+        private string secondSelect;
+
+        public StartEndSceneBase()
+        {
+            currSceneType = E_SceneType.Start;
+            title = "贪吃蛇";
+            firstSelect = "开始游戏";
+            secondSelect = "退出游戏";
+        }
+        
+        public void UpdateGameImage()
+        {
+        }
+    }
+    
 }
