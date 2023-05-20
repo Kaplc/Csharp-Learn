@@ -41,6 +41,7 @@ namespace Greedy_Snake.game
 
         public static void SceneChange(E_SceneType changeSceneType)
         {
+            Console.Clear(); // 每次切换场景清屏
             switch (changeSceneType)
             {
                 case E_SceneType.Start: // 开始场景
@@ -209,12 +210,19 @@ namespace Greedy_Snake.game
         public GameScene(int w, int h)
         {
             map = new Map(w, h);
+            food = new Food();
         }
 
         public void UpdateGameImage(int w, int h)
         {
-            Console.Clear();
             map.Draw();
+            
+            while (true)
+            {
+                food = new Food();
+                food.Draw();
+            }
+            
             Console.ReadLine();
         }
     }

@@ -7,17 +7,7 @@ namespace Greedy_Snake.game
     /// </summary>
     abstract class GameObject : I_Draw
     {
-        protected Position position;
-
-        public GameObject()
-        {
-            
-        }
-
-        public GameObject(int x, int y)
-        {
-            position = new Position(x, y);
-        }
+        public Position position;
 
         public virtual void Draw()
         {
@@ -31,11 +21,27 @@ namespace Greedy_Snake.game
     {
         public Food()
         {
-            Random r = new Random();
+            CreateFood();
+            // for (int i = 0; i < Map.walls.Length; i++)
+            // {
+            //     if (Map.walls[i].position == this.position)
+            //     {
+            //         CreateFood();
+            //     }
+            // }
         }
 
         public void CreateFood()
         {
+            Random random = new Random();
+            position = new Position(random.Next(0 + 4, 90 - 4) / 2 * 2, random.Next(0 + 2, 30 - 2)); // (/ 2 * 2):确保x是偶数
+        }
+
+        public override void Draw()
+        {
+            Console.SetCursorPosition(position.x, position.y);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("★");
         }
     }
 
@@ -66,13 +72,15 @@ namespace Greedy_Snake.game
     /// </summary>
     class Map : Wall
     {
-        public Wall[] walls;
+        public static Wall[] walls;
 
         public Map(int w, int h)
         {
             walls = new Wall[2 * w / 2 + h * 2 - 4];
-            
-            int i = 0;
+
+            int i = 0; // index
+
+            // 横墙
             int x = 0;
             for (; i < walls.Length && x < w; i++)
             {
@@ -80,7 +88,8 @@ namespace Greedy_Snake.game
                 walls[++i] = new Wall(x, h - 1);
                 x += 2;
             }
-            
+
+            // 竖墙
             int y = 1;
             for (; i < walls.Length && y < h; i++)
             {
