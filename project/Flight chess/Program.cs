@@ -209,7 +209,7 @@ namespace Flight_chess
             int selectNum = 1;
             // 打印标题
             Console.SetCursorPosition(windowsWilde / 2 - 3, 8);
-            Console.WriteLine("飞行棋");
+            Console.WriteLine("大富翁");
 
             ConsoleColor firstSelect = ConsoleColor.Red;
             ConsoleColor secondSelect = ConsoleColor.White;
