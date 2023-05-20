@@ -7,15 +7,14 @@ namespace Greedy_Snake.game
     /// </summary>
     class Game
     {
-        private int windowWide;
-        private int windowHight;
-        private E_SceneType sceneType;
+        private static int windowWide = 90;
+        private static int windowHight = 30;
+        private static I_UpdateGameImage nowScene;
 
-        public Game(int windowWide, int windowHight)
+
+        public Game()
         {
-            this.windowWide = windowWide;
-            this.windowHight = windowHight;
-            sceneType = E_SceneType.Start;
+            SceneChange(E_SceneType.Start);
             InitConsole();
         }
 
@@ -30,29 +29,30 @@ namespace Greedy_Snake.game
 
         public void StartGame()
         {
+            // 游戏主循环
             while (true)
             {
-                switch (sceneType)
+                if (nowScene != null) // 当场景对象不为空
                 {
-                    case E_SceneType.Start:
-                        StartScene startScene = new StartScene();
-                        startScene.UpdateGameImage(windowWide, windowHight, ref sceneType);
-                        break;
-                    case E_SceneType.Game:
-                        GameScene gameScene = new GameScene(windowWide, windowHight);
-                        gameScene.UpdateGameImage(windowWide, windowHight, ref sceneType);
-                        break;
-                    case E_SceneType.End:
-                        EndScene endScene = new EndScene();
-                        endScene.UpdateGameImage(windowWide, windowHight, ref sceneType);
-                        break;
+                    nowScene.UpdateGameImage(windowWide, windowHight); // 更新场景帧
                 }
             }
         }
 
-        private void SceneChange(E_SceneType changeSceneType)
+        public static void SceneChange(E_SceneType changeSceneType)
         {
-            this.sceneType = changeSceneType;
+            switch (changeSceneType)
+            {
+                case E_SceneType.Start: // 开始场景
+                    nowScene = new StartScene();
+                    break;
+                case E_SceneType.Game:
+                    nowScene = new GameScene(windowWide, windowHight);
+                    break;
+                case E_SceneType.End:
+                    nowScene = new EndScene();
+                    break;
+            }
         }
     }
 
@@ -64,7 +64,7 @@ namespace Greedy_Snake.game
         protected string title;
         protected string firstSelect;
         protected string secondSelect;
-        int selectNum = 1; // 默认选择第一个选项
+        protected int selectNum = 1; // 默认选择第一个选项
 
         protected StartEndSceneBase()
         {
@@ -74,13 +74,17 @@ namespace Greedy_Snake.game
             secondSelect = "";
         }
 
-        public void UpdateGameImage(int w, int h, ref E_SceneType currSceneType)
+        protected virtual void EnterJ()
+        {
+            
+        }
+        public void UpdateGameImage(int w, int h)
         {
             Console.Clear();
             Console.SetCursorPosition(w / 2 - 4, h / 4);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(title);
-
+            
 
             ConsoleColor firstSelectColor = ConsoleColor.Red;
             ConsoleColor secondSelectColor = ConsoleColor.White;
@@ -136,14 +140,8 @@ namespace Greedy_Snake.game
                         secondSelectColor = ConsoleColor.Red;
                         break;
                     case ConsoleKey.J:
-                        if (selectNum == 1)
-                        {
-                            currSceneType = (currSceneType == E_SceneType.Start) ? E_SceneType.Game : E_SceneType.Start;
-                            return;
-                        }
-
-                        Environment.Exit(0);
-                        break;
+                        EnterJ();
+                        return;
                 }
             }
         }
@@ -160,6 +158,18 @@ namespace Greedy_Snake.game
             firstSelect = "开始游戏";
             secondSelect = "退出游戏";
         }
+
+        protected override void EnterJ()
+        {
+            if (selectNum == 1)
+            {
+                Game.SceneChange(E_SceneType.Game);
+            }
+            else
+            {
+                Environment.Exit(0);
+            }
+        }
     }
 
     /// <summary>
@@ -172,6 +182,18 @@ namespace Greedy_Snake.game
             title = "游戏结束";
             firstSelect = "返回菜单";
             secondSelect = "退出游戏";
+        }
+        
+        protected override void EnterJ()
+        {
+            if (selectNum == 1)
+            {
+                Game.SceneChange(E_SceneType.Start);
+            }
+            else
+            {
+                Environment.Exit(0);
+            }
         }
     }
 
@@ -189,7 +211,7 @@ namespace Greedy_Snake.game
             map = new Map(w, h);
         }
 
-        public void UpdateGameImage(int w, int h, ref E_SceneType currSceneType)
+        public void UpdateGameImage(int w, int h)
         {
             Console.Clear();
             map.Draw();

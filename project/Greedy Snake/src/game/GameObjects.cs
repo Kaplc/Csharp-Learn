@@ -11,6 +11,7 @@ namespace Greedy_Snake.game
 
         public GameObject()
         {
+            
         }
 
         public GameObject(int x, int y)
