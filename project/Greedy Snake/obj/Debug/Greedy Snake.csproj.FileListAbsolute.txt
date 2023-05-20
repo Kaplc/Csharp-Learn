@@ -1,0 +1,7 @@
+G:\project\Csharp-Learn\project\Greedy Snake\bin\Debug\Greedy_Snake.exe
+G:\project\Csharp-Learn\project\Greedy Snake\bin\Debug\Greedy_Snake.pdb
+G:\project\Csharp-Learn\project\Greedy Snake\obj\Debug\Greedy Snake.csproj.AssemblyReference.cache
+G:\project\Csharp-Learn\project\Greedy Snake\obj\Debug\Greedy Snake.csproj.SuggestedBindingRedirects.cache
+G:\project\Csharp-Learn\project\Greedy Snake\obj\Debug\Greedy Snake.csproj.CoreCompileInputs.cache
+G:\project\Csharp-Learn\project\Greedy Snake\obj\Debug\Greedy_Snake.exe
+G:\project\Csharp-Learn\project\Greedy Snake\obj\Debug\Greedy_Snake.pdb
