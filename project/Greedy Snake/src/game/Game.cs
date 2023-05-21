@@ -80,9 +80,8 @@ namespace Greedy_Snake.game
         {
         }
 
-        public void UpdateGameImage(int w, int h)
+        public virtual void UpdateGameImage(int w, int h)
         {
-            Console.Clear();
             Console.SetCursorPosition(w / 2 - 4, h / 4);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(title);
@@ -196,6 +195,15 @@ namespace Greedy_Snake.game
             {
                 Environment.Exit(0);
             }
+        }
+
+        public override void UpdateGameImage(int w, int h)
+        {
+            // 执行父类方法后打印分数
+            Console.SetCursorPosition(w / 2 - 2, h / 4 + 3);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(Snake.score+" 分");
+            base.UpdateGameImage(w, h);
         }
     }
 

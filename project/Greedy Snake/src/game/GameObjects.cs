@@ -1,5 +1,4 @@
 using System;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace Greedy_Snake.game
@@ -144,16 +143,19 @@ namespace Greedy_Snake.game
         public SnakeBody[] bodys;
         private E_MoveDir nowDir;
         public int size;
-        public bool moving; // 控制线程执行
+        private bool moving; // 控制线程执行
+        public static int score;
 
         public Snake(int x, int y)
         {
             bodys = new SnakeBody[200];
             nowDir = E_MoveDir.Right; // 默认移动方向向右
             bodys[0] = new SnakeBody(E_SnakeBodyType.Header, x, y); // 初始化头
-            bodys[1] = new SnakeBody(E_SnakeBodyType.Body, x - 2, y); // 初始化身体
-            size = 2;
+            // bodys[1] = new SnakeBody(E_SnakeBodyType.Body, x - 2, y); // 初始化身体
+            // size = 2;
+            size = 1;
             moving = true;
+            score = 0;
         }
 
         private void Cleartail()
@@ -252,7 +254,7 @@ namespace Greedy_Snake.game
         {
             for (int i = 0; i < size; i++)
             {
-                if (bodys[i].position == food.position)
+                if (bodys[i].position == food.position )
                 {
                     food = new Food(this);
                     Add();
@@ -261,17 +263,18 @@ namespace Greedy_Snake.game
             }
         }
 
-        public void Add()
+        private void Add()
         {
             bodys[size] = new SnakeBody(E_SnakeBodyType.Body, bodys[size - 1].position.x, bodys[size - 1].position.y);
             size++;
+            CalScore();
         }
     
         public bool Die()
         {
             for (int i = 1; i < size; i++)
             {
-                if (bodys[0].position == bodys[i].position)
+                if (bodys[0].position == bodys[i].position && size >2)
                 {
                     moving = false;
                     return true;
@@ -289,6 +292,11 @@ namespace Greedy_Snake.game
             return false;
         }
 
+        private void CalScore()
+        {
+            score += size;
+        }
+        
         public override void Draw()
         {
             for (int i = 0; i < size; i++)
