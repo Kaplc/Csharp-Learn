@@ -221,15 +221,16 @@ namespace Greedy_Snake.game
         {
             Thread turnThread = new Thread(snake.Turn);
             turnThread.Start();
-            // snake.Turn();
             while (true)
             {
                 snake.Move();
                 snake.Eat(ref food);
+                if (snake.Die())
+                {
+                    Game.SceneChange(E_SceneType.End);
+                    return;
+                }
             }
-
-
-            Console.ReadLine();
         }
     }
 }

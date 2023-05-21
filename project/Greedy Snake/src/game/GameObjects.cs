@@ -34,7 +34,7 @@ namespace Greedy_Snake.game
             {
                 if (snake.bodys[i].position == this.position)
                 {
-                    CreateFood(snake);
+                    CreateFood(snake); // 刷在身体内则递归生成
                 }
             }
             Draw();
@@ -144,6 +144,7 @@ namespace Greedy_Snake.game
         public SnakeBody[] bodys;
         private E_MoveDir nowDir;
         public int size;
+        public bool moving; // 控制线程执行
 
         public Snake(int x, int y)
         {
@@ -152,6 +153,7 @@ namespace Greedy_Snake.game
             bodys[0] = new SnakeBody(E_SnakeBodyType.Header, x, y); // 初始化头
             bodys[1] = new SnakeBody(E_SnakeBodyType.Body, x - 2, y); // 初始化身体
             size = 2;
+            moving = true;
         }
 
         private void Cleartail()
@@ -203,7 +205,7 @@ namespace Greedy_Snake.game
         /// </summary>
         public void Turn()
         {
-            while (true)
+            while (moving)
             {
                 switch (Console.ReadKey(true).Key)
                 {
@@ -264,9 +266,27 @@ namespace Greedy_Snake.game
             bodys[size] = new SnakeBody(E_SnakeBodyType.Body, bodys[size - 1].position.x, bodys[size - 1].position.y);
             size++;
         }
-
-        public void Die()
+    
+        public bool Die()
         {
+            for (int i = 1; i < size; i++)
+            {
+                if (bodys[0].position == bodys[i].position)
+                {
+                    moving = false;
+                    return true;
+                }
+            }
+
+            for (int j = 0; j < Map.walls.Length; j++)
+            {
+                if (bodys[0].position == Map.walls[j].position)
+                {
+                    moving = false;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override void Draw()
