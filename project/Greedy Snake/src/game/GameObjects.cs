@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Greedy_Snake.game
 {
@@ -113,7 +114,7 @@ namespace Greedy_Snake.game
     /// </summary>
     class SnakeBody : GameObject
     {
-        protected E_SnakeBodyType snakeBodyType;
+        public E_SnakeBodyType snakeBodyType;
 
         public SnakeBody()
         {
@@ -128,7 +129,7 @@ namespace Greedy_Snake.game
         public override void Draw()
         {
             Console.SetCursorPosition(position.x, position.y);
-            Console.ForegroundColor = snakeBodyType == E_SnakeBodyType.Body ? ConsoleColor.Green : ConsoleColor.Yellow;
+            Console.ForegroundColor = snakeBodyType == E_SnakeBodyType.Body ? ConsoleColor.Yellow : ConsoleColor.Green;
             Console.Write("●");
         }
     }
@@ -149,6 +150,93 @@ namespace Greedy_Snake.game
             bodys[0] = new SnakeBody(E_SnakeBodyType.Header, x, y); // 初始化头
             bodys[1] = new SnakeBody(E_SnakeBodyType.Body, x - 2, y); // 初始化身体
             size = 2;
+        }
+
+        private void Cleartail()
+        {
+            Console.SetCursorPosition(bodys[size - 1].position.x, bodys[size - 1].position.y);
+            Console.Write("  ");
+        }
+
+        public void Move()
+        {
+            Thread.Sleep(100);
+            Cleartail();
+            for (int i = size - 1; i > 0; i--)
+            {
+                // bodys[i] = new SnakeBody(E_SnakeBodyType.Body, bodys[i - 1].position.x, bodys[i - 1].position.y);
+                bodys[i] = bodys[i - 1];
+                bodys[i].snakeBodyType = E_SnakeBodyType.Body;
+            }
+
+            // int headerOldX = bodys[0].position.x;
+            // int headerOldy = bodys[0].position.y;
+            int dx = 0;
+            int dy = 0;
+            switch (nowDir)
+            {
+                case E_MoveDir.Up:
+                    dx = 0;
+                    dy = -1;
+                    break;
+                case E_MoveDir.Down:
+                    dx = 0;
+                    dy = +1;
+                    break;
+                case E_MoveDir.Left:
+                    dx = -2;
+                    dy = 0;
+                    break;
+                case E_MoveDir.Right:
+                    dx = +2;
+                    dy = 0;
+                    break;
+            }
+
+            bodys[0] = new SnakeBody(E_SnakeBodyType.Header, bodys[0].position.x + dx, bodys[0].position.y + dy);
+            Draw();
+        }
+
+        public void Turn()
+        {
+            while (true)
+            {
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                    case ConsoleKey.W:
+                        if (nowDir == E_MoveDir.Down)
+                        {
+                            break;
+                        }
+                        nowDir = E_MoveDir.Up;
+                        break;
+                    case ConsoleKey.DownArrow:
+                    case ConsoleKey.S:
+                        if (nowDir == E_MoveDir.Up)
+                        {
+                            break;
+                        }
+                        nowDir = E_MoveDir.Down;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                    case ConsoleKey.A:
+                        if (nowDir == E_MoveDir.Right)
+                        {
+                            break;
+                        }
+                        nowDir = E_MoveDir.Left;
+                        break;
+                    case ConsoleKey.RightArrow:
+                    case ConsoleKey.D:
+                        if (nowDir == E_MoveDir.Left)
+                        {
+                            break;
+                        }
+                        nowDir = E_MoveDir.Right;
+                        break;
+                }
+            }
         }
 
         public override void Draw()
