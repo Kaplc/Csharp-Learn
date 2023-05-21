@@ -211,12 +211,14 @@ namespace Greedy_Snake.game
         {
             map = new Map(w, h);
             food = new Food();
+            snake = new Snake(w / 2, h / 2);
         }
 
         public void UpdateGameImage(int w, int h)
         {
             map.Draw();
             food.Draw();
+            snake.Draw();
             Console.ReadLine();
         }
     }

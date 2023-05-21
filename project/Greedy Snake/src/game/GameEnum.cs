@@ -19,4 +19,15 @@ namespace Greedy_Snake.game
         Body
     }
     
+    /// <summary>
+    /// 蛇移动方向枚举
+    /// </summary>
+    public enum E_MoveDir
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
+    
 }

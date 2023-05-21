@@ -113,8 +113,12 @@ namespace Greedy_Snake.game
     /// </summary>
     class SnakeBody : GameObject
     {
-        private E_SnakeBodyType snakeBodyType;
-        
+        protected E_SnakeBodyType snakeBodyType;
+
+        public SnakeBody()
+        {
+        }
+
         public SnakeBody(E_SnakeBodyType snakeBodyType, int x, int y)
         {
             this.snakeBodyType = snakeBodyType;
@@ -134,5 +138,25 @@ namespace Greedy_Snake.game
     /// </summary>
     class Snake : SnakeBody
     {
+        private SnakeBody[] bodys;
+        private E_MoveDir nowDir;
+        private int size;
+
+        public Snake(int x, int y)
+        {
+            bodys = new SnakeBody[200];
+            nowDir = E_MoveDir.Right; // 默认移动方向向右
+            bodys[0] = new SnakeBody(E_SnakeBodyType.Header, x, y); // 初始化头
+            bodys[1] = new SnakeBody(E_SnakeBodyType.Body, x - 2, y); // 初始化身体
+            size = 2;
+        }
+
+        public override void Draw()
+        {
+            for (int i = 0; i < size; i++)
+            {
+                bodys[i].Draw();
+            }
+        }
     }
 }
