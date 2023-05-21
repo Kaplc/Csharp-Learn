@@ -10,4 +10,13 @@ namespace Greedy_Snake.game
         End
     }
     
+    /// <summary>
+    /// 蛇身体类型枚举
+    /// </summary>
+    public enum E_SnakeBodyType
+    {
+        Header,
+        Body
+    }
+    
 }

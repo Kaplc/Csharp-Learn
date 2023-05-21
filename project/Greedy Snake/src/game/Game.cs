@@ -216,13 +216,7 @@ namespace Greedy_Snake.game
         public void UpdateGameImage(int w, int h)
         {
             map.Draw();
-            
-            while (true)
-            {
-                food = new Food();
-                food.Draw();
-            }
-            
+            food.Draw();
             Console.ReadLine();
         }
     }

@@ -113,6 +113,20 @@ namespace Greedy_Snake.game
     /// </summary>
     class SnakeBody : GameObject
     {
+        private E_SnakeBodyType snakeBodyType;
+        
+        public SnakeBody(E_SnakeBodyType snakeBodyType, int x, int y)
+        {
+            this.snakeBodyType = snakeBodyType;
+            position = new Position(x, y);
+        }
+
+        public override void Draw()
+        {
+            Console.SetCursorPosition(position.x, position.y);
+            Console.ForegroundColor = snakeBodyType == E_SnakeBodyType.Body ? ConsoleColor.Green : ConsoleColor.Yellow;
+            Console.Write("●");
+        }
     }
 
     /// <summary>
