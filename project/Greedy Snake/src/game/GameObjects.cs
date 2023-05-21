@@ -1,4 +1,5 @@
 using System;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace Greedy_Snake.game
@@ -20,22 +21,23 @@ namespace Greedy_Snake.game
     /// </summary>
     class Food : GameObject
     {
-        public Food()
+        public Food(Snake snake)
         {
-            CreateFood();
-            // for (int i = 0; i < Map.walls.Length; i++)
-            // {
-            //     if (Map.walls[i].position == this.position)
-            //     {
-            //         CreateFood();
-            //     }
-            // }
+            CreateFood(snake);
         }
 
-        public void CreateFood()
+        private void CreateFood(Snake snake)
         {
             Random random = new Random();
             position = new Position(random.Next(0 + 4, 90 - 4) / 2 * 2, random.Next(0 + 2, 30 - 2)); // (/ 2 * 2):确保x是偶数
+            for (int i = 0; i < snake.size; i++)
+            {
+                if (snake.bodys[i].position == this.position)
+                {
+                    CreateFood(snake);
+                }
+            }
+            Draw();
         }
 
         public override void Draw()
@@ -139,9 +141,9 @@ namespace Greedy_Snake.game
     /// </summary>
     class Snake : SnakeBody
     {
-        private SnakeBody[] bodys;
+        public SnakeBody[] bodys;
         private E_MoveDir nowDir;
-        private int size;
+        public int size;
 
         public Snake(int x, int y)
         {
@@ -161,16 +163,15 @@ namespace Greedy_Snake.game
         public void Move()
         {
             Thread.Sleep(100);
-            Cleartail();
+            Cleartail(); // 擦除尾部
             for (int i = size - 1; i > 0; i--)
             {
-                // bodys[i] = new SnakeBody(E_SnakeBodyType.Body, bodys[i - 1].position.x, bodys[i - 1].position.y);
+                // 身体移动
                 bodys[i] = bodys[i - 1];
                 bodys[i].snakeBodyType = E_SnakeBodyType.Body;
             }
 
-            // int headerOldX = bodys[0].position.x;
-            // int headerOldy = bodys[0].position.y;
+            // 移动单位方向
             int dx = 0;
             int dy = 0;
             switch (nowDir)
@@ -197,6 +198,9 @@ namespace Greedy_Snake.game
             Draw();
         }
 
+        /// <summary>
+        /// 多线程执行读取转向命令
+        /// </summary>
         public void Turn()
         {
             while (true)
@@ -217,6 +221,7 @@ namespace Greedy_Snake.game
                         {
                             break;
                         }
+
                         nowDir = E_MoveDir.Down;
                         break;
                     case ConsoleKey.LeftArrow:
@@ -225,6 +230,7 @@ namespace Greedy_Snake.game
                         {
                             break;
                         }
+
                         nowDir = E_MoveDir.Left;
                         break;
                     case ConsoleKey.RightArrow:
@@ -233,10 +239,34 @@ namespace Greedy_Snake.game
                         {
                             break;
                         }
+
                         nowDir = E_MoveDir.Right;
                         break;
                 }
             }
+        }
+
+        public void Eat(ref Food food)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                if (bodys[i].position == food.position)
+                {
+                    food = new Food(this);
+                    Add();
+                    break;
+                }
+            }
+        }
+
+        public void Add()
+        {
+            bodys[size] = new SnakeBody(E_SnakeBodyType.Body, bodys[size - 1].position.x, bodys[size - 1].position.y);
+            size++;
+        }
+
+        public void Die()
+        {
         }
 
         public override void Draw()

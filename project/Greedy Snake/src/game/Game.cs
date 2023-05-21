@@ -78,15 +78,15 @@ namespace Greedy_Snake.game
 
         protected virtual void EnterJ()
         {
-            
         }
+
         public void UpdateGameImage(int w, int h)
         {
             Console.Clear();
             Console.SetCursorPosition(w / 2 - 4, h / 4);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(title);
-            
+
 
             ConsoleColor firstSelectColor = ConsoleColor.Red;
             ConsoleColor secondSelectColor = ConsoleColor.White;
@@ -185,7 +185,7 @@ namespace Greedy_Snake.game
             firstSelect = "返回菜单";
             secondSelect = "退出游戏";
         }
-        
+
         protected override void EnterJ()
         {
             if (selectNum == 1)
@@ -211,12 +211,10 @@ namespace Greedy_Snake.game
         public GameScene(int w, int h)
         {
             map = new Map(w, h);
-            food = new Food();
-            snake = new Snake(w / 2, h / 2);
-            
+            snake = new Snake(w / 2 + 1, h / 2);
+            food = new Food(snake);
+
             map.Draw();
-            food.Draw();
-            snake.Draw();
         }
 
         public void UpdateGameImage(int w, int h)
@@ -227,10 +225,10 @@ namespace Greedy_Snake.game
             while (true)
             {
                 snake.Move();
+                snake.Eat(ref food);
             }
-            
-            
-            
+
+
             Console.ReadLine();
         }
     }
