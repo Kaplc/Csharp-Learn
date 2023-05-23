@@ -1,0 +1,7 @@
+G:\project\Csharp-Learn\project\Tetris\bin\Debug\Tetris.exe
+G:\project\Csharp-Learn\project\Tetris\bin\Debug\Tetris.pdb
+G:\project\Csharp-Learn\project\Tetris\obj\Debug\Tetris.csproj.AssemblyReference.cache
+G:\project\Csharp-Learn\project\Tetris\obj\Debug\Tetris.csproj.SuggestedBindingRedirects.cache
+G:\project\Csharp-Learn\project\Tetris\obj\Debug\Tetris.csproj.CoreCompileInputs.cache
+G:\project\Csharp-Learn\project\Tetris\obj\Debug\Tetris.exe
+G:\project\Csharp-Learn\project\Tetris\obj\Debug\Tetris.pdb
