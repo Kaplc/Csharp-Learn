@@ -1,8 +1,10 @@
+using System;
+
 namespace Tetris
 {
     #region 枚举
 
-    public enum BlockType
+    public enum EBlockType
     {
         Wall,
         /// <summary>
@@ -69,8 +71,54 @@ namespace Tetris
     }
 
     #endregion
-
-    public class GameObject
+    
+    public abstract class GameObject: IDraw
     {
+        public Position pos;
+        public EBlockType blockType;
+        
+        public virtual void Draw()
+        {
+            Console.SetCursorPosition(pos.X, pos.Y);
+            ConsoleColor color = ConsoleColor.Red;
+            switch (blockType)
+            {
+                case EBlockType.Wall:
+                    color = ConsoleColor.Red;
+                    break;
+                case EBlockType.Strip:
+                    color = ConsoleColor.Green;
+                    break;
+                case EBlockType.Square:
+                    color = ConsoleColor.Cyan;
+                    break;
+                case EBlockType.Stairs:
+                    color = ConsoleColor.Blue;
+                    break;
+                case EBlockType.LongCrutch:
+                    color = ConsoleColor.Gray;
+                    break;
+            }
+
+            Console.ForegroundColor = color;
+            Console.Write("■");
+        }
+        
+        public void ChangeType(EBlockType oldBlockType)
+        {
+            this.blockType = oldBlockType;
+        }
+        
+    }
+    
+    /// <summary>
+    /// 墙
+    /// </summary>
+    public class Wall: GameObject
+    {
+        public Wall(int x, )
+        {
+            
+        }
     }
 }
