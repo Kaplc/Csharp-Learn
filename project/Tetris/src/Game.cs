@@ -30,7 +30,7 @@ namespace Tetris
 
     public class Game
     {
-        private static int windowWide = 90;
+        private static int windowWide = 50;
         private static int windowHight = 30;
         public static int WindowWide
         {
@@ -241,9 +241,16 @@ namespace Tetris
 
     class GameScene : I_UpdateGameImage
     {
+        public Map map;
+        
+        public GameScene()
+        {
+            map = new Map();
+        }
         public void UpdateGameImage()
         {
-            
+            map.Draw();
+            Console.ReadKey();
         }
     }
 }

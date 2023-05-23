@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Tetris
 {
@@ -7,22 +8,27 @@ namespace Tetris
     public enum EBlockType
     {
         Wall,
+
         /// <summary>
         /// 方形
         /// </summary>
         Square,
+
         /// <summary>
         /// 长条
         /// </summary>
         Strip,
+
         /// <summary>
         /// 坦克
         /// </summary>
         Tanker,
+
         /// <summary>
         /// 楼梯
         /// </summary>
         Stairs,
+
         /// <summary>
         /// 长拐
         /// </summary>
@@ -71,12 +77,12 @@ namespace Tetris
     }
 
     #endregion
-    
-    public abstract class GameObject: IDraw
+
+    public abstract class GameObject : IDraw
     {
         public Position pos;
         public EBlockType blockType;
-        
+
         public virtual void Draw()
         {
             Console.SetCursorPosition(pos.X, pos.Y);
@@ -103,22 +109,67 @@ namespace Tetris
             Console.ForegroundColor = color;
             Console.Write("■");
         }
-        
+
         public void ChangeType(EBlockType oldBlockType)
         {
             this.blockType = oldBlockType;
         }
-        
     }
-    
+
     /// <summary>
     /// 墙
     /// </summary>
-    public class Wall: GameObject
+    public class Wall : GameObject
     {
-        public Wall(int x, )
+        public Wall(int x, int y)
         {
-            
+            pos = new Position(x, y);
+            blockType = EBlockType.Wall;
+        }
+    }
+
+    public class Map : GameObject
+    {
+        public int wide = Game.WindowWide - 2;
+        public int hight = Game.WindowHight - 6;
+        public List<Wall> walls = new List<Wall>();
+        public List<Wall> dynamicWalls = new List<Wall>();
+
+        public Map()
+        {
+            // 横墙
+            for (int x = 0; x <= wide; x += 2)
+            {
+                walls.Add(new Wall(x, hight));
+            }
+
+            // 竖墙
+            for (int y = 0; y < hight; y++)
+            {
+                walls.Add(new Wall(0, y));
+                walls.Add(new Wall(wide, y));
+            }
+        }
+
+        public override void Draw()
+        {
+            for (int i = 0; i < walls.Count; i++)
+            {
+                walls[i].Draw();
+            }
+
+            for (int j = 0; j < dynamicWalls.Count; j++)
+            {
+                dynamicWalls[j].Draw();
+            }
+        }
+
+        public void AddDynamicWalls(List<Wall> srcWalls)
+        {
+            for (int i = 0; i < srcWalls.Count; i++)
+            {
+                dynamicWalls.Add(srcWalls[i]);
+            }
         }
     }
 }
