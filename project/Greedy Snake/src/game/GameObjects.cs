@@ -166,7 +166,7 @@ namespace Greedy_Snake.game
 
         public void Move()
         {
-            Thread.Sleep(100);
+            Thread.Sleep(80);
             Cleartail(); // 擦除尾部
             for (int i = size - 1; i > 0; i--)
             {
