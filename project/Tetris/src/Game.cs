@@ -251,12 +251,13 @@ namespace Tetris
         }
         public void UpdateGameImage()
         {
+            worker.NewBlock();
             while (true)
             {
                 map.Draw();
-                worker.NewBlock();
                 worker.Draw();
                 Console.ReadKey(true);
+                worker.ChangeBlock();
             }
             
         }

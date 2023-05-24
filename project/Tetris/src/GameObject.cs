@@ -45,6 +45,12 @@ namespace Tetris
         RLongCrutch,
     }
 
+    public enum ELeftOrRight
+    {
+        Left,
+        Right
+    }
+
     #endregion
 
     #region 结构体
@@ -272,29 +278,58 @@ namespace Tetris
     public class BigBlock : IDraw
     {
         public List<smallBlock> smallBlocks = new List<smallBlock>();
+        public List<Position[]> smallBlockInfos;
         public EBlockType bigBlockType;
-        public int blockInfosIndex;
+        public int blockInfosIndex; // 当前变形索引
 
         public BigBlock()
         {
-            CreateBigBlock(); // 创建剩余组成部分
-        }
-
-        public void CreateBigBlock()
-        {
             Random r = new Random();
+            // 随机方块类型
             int BlockTypeIndex = r.Next(1, 8);
             bigBlockType = (EBlockType)BlockTypeIndex; // 初始化大方块类型
-            List<Position[]> smallBlockInfos = new BigBlockInfo(bigBlockType).blockInfos; // 下标获取枚举->获取某个类型的方块中包含小方块信息数组
-            
+            smallBlockInfos = new BigBlockInfo(bigBlockType).blockInfos; // 下标获取枚举->获取某个类型的方块中包含小方块信息数组
+
+            // 随机生成方块变形
             blockInfosIndex = r.Next(0, smallBlockInfos.Count);
+            Create(); // 创建剩余组成部分
+        }
+
+        public void Create()
+        {
             Position[] CreatedBlockInfo = smallBlockInfos[blockInfosIndex]; // 小方块信息数组中的其中一种变形
-            
+
             smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2, 4))); // 初始化原点方块
             for (int i = 0; i < CreatedBlockInfo.Length; i++)
             {
                 smallBlocks.Add(new smallBlock(bigBlockType, CreatedBlockInfo[i] + smallBlocks[0].pos));
             }
+        }
+
+        public void Change(ELeftOrRight sign = ELeftOrRight.Right)
+        {
+            switch (sign)
+            {
+                case ELeftOrRight.Left:
+                    blockInfosIndex--;
+                    break;
+                case ELeftOrRight.Right:
+                    blockInfosIndex++;
+                    break;
+            }
+
+            if (blockInfosIndex > smallBlockInfos.Count - 1)
+            {
+                blockInfosIndex = 0;
+            }
+            else if (blockInfosIndex < 0)
+            {
+                blockInfosIndex = smallBlockInfos.Count - 1;
+            }
+            
+            Clear();
+            smallBlocks.Clear();
+            Create();
         }
 
         public void Clear()
@@ -305,6 +340,7 @@ namespace Tetris
                 Console.Write("  ");
             }
         }
+
         public void Draw()
         {
             for (int i = 0; i < smallBlocks.Count; i++)
@@ -323,21 +359,28 @@ namespace Tetris
 
         public Worker()
         {
-            
         }
 
         public void NewBlock()
         {
             if (block != null)
                 block.Clear();
-            
+
             block = new BigBlock();
         }
-        
+
+        public void ChangeBlock()
+        {
+            block.Change();
+        }
+
+        public void MoveBlock()
+        {
+        }
+
         public void Draw()
         {
             block.Draw();
         }
-        
     }
 }
