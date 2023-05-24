@@ -242,15 +242,23 @@ namespace Tetris
     class GameScene : I_UpdateGameImage
     {
         public Map map;
+        public Worker worker;
         
         public GameScene()
         {
             map = new Map();
+            worker = new Worker();
         }
         public void UpdateGameImage()
         {
-            map.Draw();
-            Console.ReadKey();
+            while (true)
+            {
+                map.Draw();
+                worker.NewBlock();
+                worker.Draw();
+                Console.ReadKey(true);
+            }
+            
         }
     }
 }
