@@ -297,6 +297,14 @@ namespace Tetris
             }
         }
 
+        public void Clear()
+        {
+            for (int i = 0; i < smallBlocks.Count; i++)
+            {
+                Console.SetCursorPosition(smallBlocks[i].pos.X, smallBlocks[i].pos.Y);
+                Console.Write("  ");
+            }
+        }
         public void Draw()
         {
             for (int i = 0; i < smallBlocks.Count; i++)
@@ -320,6 +328,9 @@ namespace Tetris
 
         public void NewBlock()
         {
+            if (block != null)
+                block.Clear();
+            
             block = new BigBlock();
         }
         
@@ -327,5 +338,6 @@ namespace Tetris
         {
             block.Draw();
         }
+        
     }
 }
