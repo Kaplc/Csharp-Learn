@@ -298,47 +298,78 @@ namespace Tetris
             int BlockTypeIndex = r.Next(1, 8);
             bigBlockType = (EBlockType)BlockTypeIndex; // 初始化大方块类型
             smallBlockInfos = new BigBlockInfo(bigBlockType).blockInfos; // 下标获取枚举->获取某个类型的方块中包含小方块信息数组
-
+            
+            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2 + 1, 4))); // 初始化原点方块
+            
             // 随机生成方块变形
             blockInfosIndex = r.Next(0, smallBlockInfos.Count);
-            Create(); // 创建剩余组成部分
+            Create(blockInfosIndex); // 创建剩余组成部分
         }
 
-        public void Create()
+        public void Create(int newIndex)
         {
-            Position[] CreatedBlockInfo = smallBlockInfos[blockInfosIndex]; // 小方块信息数组中的其中一种变形
-
-            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2 + 1, 4))); // 初始化原点方块
+            // 预创建
+            List<smallBlock> newSmallBlocks = new List<smallBlock>();
+            Position[] CreatedBlockInfo = smallBlockInfos[newIndex]; // 小方块信息数组中的其中一种变形
+            newSmallBlocks.Add(smallBlocks[0]); 
             for (int i = 0; i < CreatedBlockInfo.Length; i++)
             {
-                smallBlocks.Add(new smallBlock(bigBlockType, CreatedBlockInfo[i] + smallBlocks[0].pos));
+                newSmallBlocks.Add(new smallBlock(bigBlockType, CreatedBlockInfo[i] + newSmallBlocks[0].pos));
             }
+            
+            // 碰撞判断
+            for (int i = 0; i < newSmallBlocks.Count; i++)
+            {
+                for (int j = 0; j < Map.walls.Count; j++)
+                {
+                    if (newSmallBlocks[i].pos.X == Map.walls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == Map.walls[j].pos.Y) // 固定墙判断
+                    {
+                        return;
+                    }
+                }
+
+                for (int j = 0; j < Map.dynamicWalls.Count; j++)
+                {
+                    if (newSmallBlocks[i].pos.X == Map.dynamicWalls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == Map.dynamicWalls[j].pos.Y) // 动态墙判断
+                    {
+                        return;
+                    }
+                }
+            }
+            
+            // 真实创建
+            blockInfosIndex = newIndex;
+            smallBlocks.Clear();
+            smallBlocks = newSmallBlocks;
         }
 
         public void Change(EDir sign)
         {
+            // 预变形索引
+            int newIndex = blockInfosIndex;
             switch (sign)
             {
                 case EDir.Left:
-                    blockInfosIndex--;
+                    newIndex--;
                     break;
                 case EDir.Right:
-                    blockInfosIndex++;
+                    newIndex++;
                     break;
             }
 
-            if (blockInfosIndex > smallBlockInfos.Count - 1)
+            if (newIndex > smallBlockInfos.Count - 1)
             {
-                blockInfosIndex = 0;
+                newIndex = 0;
             }
-            else if (blockInfosIndex < 0)
+            else if (newIndex < 0)
             {
-                blockInfosIndex = smallBlockInfos.Count - 1;
+                newIndex = smallBlockInfos.Count - 1;
             }
 
             Clear();
-            smallBlocks.Clear();
-            Create();
+            Create(newIndex); // 创建新方块
         }
 
         public void Clear()
@@ -381,9 +412,7 @@ namespace Tetris
         public void ChangeBlock(EDir sign)
         {
             if (block == null) return;
-            
-            
-            
+
             block.Change(sign);
         }
 
@@ -433,31 +462,34 @@ namespace Tetris
                 else
                     tempY += 1;
 
-                newSmallBlocks.Add(new smallBlock(block.smallBlocks[i].blockType, new Position(tempX, tempY))); // 生成预移动的方块
+                newSmallBlocks.Add(new smallBlock(block.smallBlocks[i].blockType,
+                    new Position(tempX, tempY))); // 生成预移动的方块
             }
-            
+
             // 碰撞判断
             for (int i = 0; i < newSmallBlocks.Count; i++)
             {
                 for (int j = 0; j < Map.walls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == Map.walls[j].pos.X && newSmallBlocks[i].pos.Y == Map.walls[j].pos.Y) // 固定墙判断
+                    if (newSmallBlocks[i].pos.X == Map.walls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == Map.walls[j].pos.Y) // 固定墙判断
                     {
                         return;
                     }
                 }
+
                 for (int j = 0; j < Map.dynamicWalls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == Map.dynamicWalls[j].pos.X && newSmallBlocks[i].pos.Y == Map.dynamicWalls[j].pos.Y) // 动态墙判断
+                    if (newSmallBlocks[i].pos.X == Map.dynamicWalls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == Map.dynamicWalls[j].pos.Y) // 动态墙判断
                     {
                         return;
                     }
                 }
             }
-            
-            block.Clear(); 
+
+            block.Clear();
             block.smallBlocks = newSmallBlocks; // 预移动变成真实移动
-            
         }
 
         public void Draw()
