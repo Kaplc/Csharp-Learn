@@ -171,7 +171,7 @@ namespace Tetris
         public int hight = Game.WindowHight - 6;
 
         public int[] count; // 每行的方块数量
-        public int score;
+        public static int score = 0;
 
         public List<Wall> walls = new List<Wall>();
         public List<SmallBlock> dynamicWalls = new List<SmallBlock>();
@@ -190,13 +190,13 @@ namespace Tetris
                 walls.Add(new Wall(0, y));
                 walls.Add(new Wall(wide, y));
             }
-            
         }
 
-        public void CalScore()
+        public void CalScore(int count)
         {
-            
+            score = (int)(score * 1.1 + count);
         }
+
         public void ClearLine()
         {
             // 获取每行方块数量
@@ -205,7 +205,7 @@ namespace Tetris
             {
                 count[dynamicWalls[i].pos.Y]++;
             }
-            
+
             // 临时List记录要删除的动态墙壁
             List<SmallBlock> temp = new List<SmallBlock>();
             for (int line = 0; line < count.Length; line++)
@@ -234,6 +234,8 @@ namespace Tetris
                             item.pos.Y++;
                         }
                     }
+
+                    CalScore(count[line]);
                 }
             }
         }
@@ -539,9 +541,14 @@ namespace Tetris
                     tempX += 2;
                 else if (dir == EDir.Left)
                     tempX -= 2;
-                else
+                else if (dir == EDir.Down)
+                {
                     tempY += 1;
-
+                }
+                else
+                {
+                    return;
+                }
                 newSmallBlocks.Add(new SmallBlock(block.smallBlocks[i].blockType,
                     new Position(tempX, tempY))); // 生成预移动的方块
             }
@@ -552,9 +559,9 @@ namespace Tetris
                 for (int j = 0; j < map.walls.Count; j++)
                 {
                     if (newSmallBlocks[i].pos.X <= 0 ||
-                        newSmallBlocks[i].pos.X >= map.wide-1||
+                        newSmallBlocks[i].pos.X >= map.wide - 1 ||
                         newSmallBlocks[i].pos.Y >= map.hight
-                        ) // 固定墙判断
+                       ) // 固定墙判断
                     {
                         return;
                     }

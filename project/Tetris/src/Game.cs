@@ -31,8 +31,8 @@ namespace Tetris
 
     public class Game
     {
-        private static int windowWide = 22;
-        private static int windowHight = 35;
+        private static int windowWide = 42;
+        private static int windowHight = 30;
 
         public static int WindowWide
         {
@@ -231,6 +231,15 @@ namespace Tetris
                 Environment.Exit(0);
             }
         }
+
+        public override void UpdateGameImage()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.SetCursorPosition(Game.WindowWide/2-"得分:0".Length, Game.WindowHight/4+3);
+            Console.WriteLine($"得分: {Map.score}");
+            base.UpdateGameImage();
+            
+        }
     }
 
     class GameScene : I_UpdateGameImage
@@ -251,6 +260,9 @@ namespace Tetris
             worker.NewBlock();
             moveTheard.action += worker.KeyCheck; // 初始化按键线程
             
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.SetCursorPosition(0,Game.WindowHight-5);
+            Console.WriteLine("操作说明:QE旋转, S加速下落, AD左右移动");
             
             while (true)
             {
@@ -266,9 +278,17 @@ namespace Tetris
                         break;
                     }
                     map.ClearLine();
+                    
+                    Console.SetCursorPosition(Game.WindowWide/2-"当前分数:0".Length, Game.WindowHight-3);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"当前分数:{Map.score}");
                 }
-                Thread.Sleep(10);
+                
+                Thread.Sleep(100);
+                
             }
+            
+            
         }
     }
 }
