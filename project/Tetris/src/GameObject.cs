@@ -45,10 +45,11 @@ namespace Tetris
         RLongCrutch,
     }
 
-    public enum ELeftOrRight
+    public enum EDir
     {
         Left,
-        Right
+        Right,
+        Down
     }
 
     #endregion
@@ -63,11 +64,13 @@ namespace Tetris
         public int X
         {
             get => x;
+            set { x = value; }
         }
 
         public int Y
         {
             get => y;
+            set { y = value; }
         }
 
         public Position(int x, int y)
@@ -306,14 +309,14 @@ namespace Tetris
             }
         }
 
-        public void Change(ELeftOrRight sign)
+        public void Change(EDir sign)
         {
             switch (sign)
             {
-                case ELeftOrRight.Left:
+                case EDir.Left:
                     blockInfosIndex--;
                     break;
-                case ELeftOrRight.Right:
+                case EDir.Right:
                     blockInfosIndex++;
                     break;
             }
@@ -326,7 +329,7 @@ namespace Tetris
             {
                 blockInfosIndex = smallBlockInfos.Count - 1;
             }
-            
+
             Clear();
             smallBlocks.Clear();
             Create();
@@ -369,10 +372,10 @@ namespace Tetris
             block = new BigBlock();
         }
 
-        public void ChangeBlock(ELeftOrRight sign)
+        public void ChangeBlock(EDir sign)
         {
-            if (block == null)return;
-            
+            if (block == null) return;
+
             block.Change(sign);
         }
 
@@ -386,19 +389,36 @@ namespace Tetris
                     {
                         // QE旋转, S加速下降, AD左右移动
                         case ConsoleKey.Q:
-                            ChangeBlock(ELeftOrRight.Left);
+                            ChangeBlock(EDir.Left);
                             break;
                         case ConsoleKey.E:
-                            ChangeBlock(ELeftOrRight.Right);
+                            ChangeBlock(EDir.Right);
                             break;
                         case ConsoleKey.S:
+                            Move(EDir.Down);
                             break;
                         case ConsoleKey.A:
+                            Move(EDir.Left);
                             break;
                         case ConsoleKey.D:
+                            Move(EDir.Right);
                             break;
                     }
                 }
+            }
+        }
+
+        public void Move(EDir dir)
+        {
+            block.Clear();
+            for (int i = 0; i < block.smallBlocks.Count; i++)
+            {
+                if (dir == EDir.Right)
+                    block.smallBlocks[i].pos.X += 2;
+                else if (dir == EDir.Left)
+                    block.smallBlocks[i].pos.X -= 2;
+                else
+                    block.smallBlocks[i].pos.Y ++;
             }
         }
 
