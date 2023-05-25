@@ -162,8 +162,8 @@ namespace Tetris
     {
         public int wide = Game.WindowWide - 2;
         public int hight = Game.WindowHight - 6;
-        public List<Wall> walls = new List<Wall>();
-        public List<Wall> dynamicWalls = new List<Wall>();
+        public static List<Wall> walls = new List<Wall>();
+        public static List<Wall> dynamicWalls = new List<Wall>();
 
         public Map()
         {
@@ -273,6 +273,12 @@ namespace Tetris
             this.blockType = blockType;
             this.pos = pos;
         }
+
+        public void Clear()
+        {
+            Console.SetCursorPosition(pos.X, pos.Y);
+            Console.Write("  ");
+        }
     }
 
     /// <summary>
@@ -302,7 +308,7 @@ namespace Tetris
         {
             Position[] CreatedBlockInfo = smallBlockInfos[blockInfosIndex]; // 小方块信息数组中的其中一种变形
 
-            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2, 4))); // 初始化原点方块
+            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2 + 1, 4))); // 初始化原点方块
             for (int i = 0; i < CreatedBlockInfo.Length; i++)
             {
                 smallBlocks.Add(new smallBlock(bigBlockType, CreatedBlockInfo[i] + smallBlocks[0].pos));
@@ -339,8 +345,7 @@ namespace Tetris
         {
             for (int i = 0; i < smallBlocks.Count; i++)
             {
-                Console.SetCursorPosition(smallBlocks[i].pos.X, smallBlocks[i].pos.Y);
-                Console.Write("  ");
+                smallBlocks[i].Clear();
             }
         }
 
@@ -362,6 +367,7 @@ namespace Tetris
 
         public Worker()
         {
+            NewBlock(); // 第一次初始化新方块
         }
 
         public void NewBlock()
@@ -375,7 +381,9 @@ namespace Tetris
         public void ChangeBlock(EDir sign)
         {
             if (block == null) return;
-
+            
+            
+            
             block.Change(sign);
         }
 
@@ -410,16 +418,46 @@ namespace Tetris
 
         public void Move(EDir dir)
         {
-            block.Clear();
+            List<smallBlock> newSmallBlocks = new List<smallBlock>();
+            // 临时变量预移动
+            int tempX = 0;
+            int tempY = 0;
             for (int i = 0; i < block.smallBlocks.Count; i++)
             {
+                tempX = block.smallBlocks[i].pos.X;
+                tempY = block.smallBlocks[i].pos.Y;
                 if (dir == EDir.Right)
-                    block.smallBlocks[i].pos.X += 2;
+                    tempX += 2;
                 else if (dir == EDir.Left)
-                    block.smallBlocks[i].pos.X -= 2;
+                    tempX -= 2;
                 else
-                    block.smallBlocks[i].pos.Y ++;
+                    tempY += 1;
+
+                newSmallBlocks.Add(new smallBlock(block.smallBlocks[i].blockType, new Position(tempX, tempY))); // 生成预移动的方块
             }
+            
+            // 碰撞判断
+            for (int i = 0; i < newSmallBlocks.Count; i++)
+            {
+                for (int j = 0; j < Map.walls.Count; j++)
+                {
+                    if (newSmallBlocks[i].pos.X == Map.walls[j].pos.X && newSmallBlocks[i].pos.Y == Map.walls[j].pos.Y) // 固定墙判断
+                    {
+                        return;
+                    }
+                }
+                for (int j = 0; j < Map.dynamicWalls.Count; j++)
+                {
+                    if (newSmallBlocks[i].pos.X == Map.dynamicWalls[j].pos.X && newSmallBlocks[i].pos.Y == Map.dynamicWalls[j].pos.Y) // 动态墙判断
+                    {
+                        return;
+                    }
+                }
+            }
+            
+            block.Clear(); 
+            block.smallBlocks = newSmallBlocks; // 预移动变成真实移动
+            
         }
 
         public void Draw()
