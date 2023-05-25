@@ -32,7 +32,7 @@ namespace Tetris
     public class Game
     {
         private static int windowWide = 50;
-        private static int windowHight = 40;
+        private static int windowHight = 35;
 
         public static int WindowWide
         {
@@ -235,34 +235,39 @@ namespace Tetris
 
     class GameScene : I_UpdateGameImage
     {
-        public static Map map;
+        public Map map;
         public Worker worker;
         public MoveTheard moveTheard = MoveTheard.Instance;
 
         public GameScene()
         {
             map = new Map();
-            worker = new Worker();
-
-            // moveTheard.action += worker.MoveBlock; // 初始化按键线程
+            worker = new Worker(map);
+            
         }
 
         public void UpdateGameImage()
         {
             worker.NewBlock();
             moveTheard.action += worker.KeyCheck; // 初始化按键线程
-
+            
+            
             while (true)
             {
-                
                 lock (map)
                 {
                     map.Draw();
                     worker.Move(EDir.Down);
+                    worker.FailingBottom(map);
                 }
                 
-                
-                Thread.Sleep(100);
+                if (map.GameOver())
+                {
+                    Game.SceneChange(E_SceneType.End);
+                    moveTheard.action -= worker.KeyCheck;
+                    break;
+                }
+                Thread.Sleep(50);
             }
         }
     }

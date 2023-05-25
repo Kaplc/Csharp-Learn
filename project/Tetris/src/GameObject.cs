@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Tetris
 {
@@ -107,10 +108,11 @@ namespace Tetris
 
         public virtual void Draw()
         {
-            if (pos.Y < 0)
+            if (pos.Y < 0 || pos.X < 0 || pos.X > Game.WindowWide)
             {
                 return;
             }
+
             Console.SetCursorPosition(pos.X, pos.Y);
             ConsoleColor color = ConsoleColor.Red;
             switch (blockType)
@@ -166,8 +168,8 @@ namespace Tetris
     {
         public int wide = Game.WindowWide - 2;
         public int hight = Game.WindowHight - 6;
-        public static List<Wall> walls = new List<Wall>();
-        public static List<Wall> dynamicWalls = new List<Wall>();
+        public List<Wall> walls = new List<Wall>();
+        public List<SmallBlock> dynamicWalls = new List<SmallBlock>();
 
         public Map()
         {
@@ -198,12 +200,26 @@ namespace Tetris
             }
         }
 
-        public void AddDynamicWalls(List<Wall> srcWalls)
+        public void AddDynamicWalls(List<SmallBlock> smallBlocks)
         {
-            for (int i = 0; i < srcWalls.Count; i++)
+            for (int i = 0; i < smallBlocks.Count; i++)
             {
-                dynamicWalls.Add(srcWalls[i]);
+                smallBlocks[i].ChangeType(EBlockType.Wall);
+                dynamicWalls.Add(smallBlocks[i]);
             }
+
+            Draw();
+        }
+
+        public bool GameOver()
+        {
+            for (int i = 0; i < dynamicWalls.Count; i++)
+            {
+                if (dynamicWalls[i].pos.Y <= 0)
+                    return true;
+            }
+
+            return false;
         }
     }
 
@@ -270,9 +286,9 @@ namespace Tetris
     /// <summary>
     /// 组成大方块的小方块
     /// </summary>
-    public class smallBlock : GameObject
+    public class SmallBlock : GameObject
     {
-        public smallBlock(EBlockType blockType, Position pos)
+        public SmallBlock(EBlockType blockType, Position pos)
         {
             this.blockType = blockType;
             this.pos = pos;
@@ -280,10 +296,11 @@ namespace Tetris
 
         public void Clear()
         {
-            if (pos.Y<0)
+            if (pos.Y < 0 || pos.X < 0 || pos.X > Game.WindowWide) // 缓冲区外不打印
             {
                 return;
             }
+
             Console.SetCursorPosition(pos.X, pos.Y);
             Console.Write("  ");
         }
@@ -294,12 +311,12 @@ namespace Tetris
     /// </summary>
     public class BigBlock : IDraw
     {
-        public List<smallBlock> smallBlocks = new List<smallBlock>();
+        public List<SmallBlock> smallBlocks = new List<SmallBlock>();
         public List<Position[]> smallBlockInfos;
         public EBlockType bigBlockType;
         public int blockInfosIndex; // 当前变形索引
 
-        public BigBlock()
+        public BigBlock(Map map)
         {
             Random r = new Random();
             // 随机方块类型
@@ -307,40 +324,40 @@ namespace Tetris
             bigBlockType = (EBlockType)BlockTypeIndex; // 初始化大方块类型
             smallBlockInfos = new BigBlockInfo(bigBlockType).blockInfos; // 下标获取枚举->获取某个类型的方块中包含小方块信息数组
 
-            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2 + 1, -4))); // 初始化原点方块
+            smallBlocks.Add(new SmallBlock(bigBlockType, new Position(Game.WindowWide / 2 - 1, -4))); // 初始化原点方块
 
             // 随机生成方块变形
             blockInfosIndex = r.Next(0, smallBlockInfos.Count);
-            Create(blockInfosIndex); // 创建剩余组成部分
+            Create(blockInfosIndex, map); // 创建剩余组成部分
         }
 
-        public void Create(int newIndex)
+        public void Create(int newIndex, Map map)
         {
             // 预创建
-            List<smallBlock> newSmallBlocks = new List<smallBlock>();
+            List<SmallBlock> newSmallBlocks = new List<SmallBlock>();
             Position[] CreatedBlockInfo = smallBlockInfos[newIndex]; // 小方块信息数组中的其中一种变形
             newSmallBlocks.Add(smallBlocks[0]);
             for (int i = 0; i < CreatedBlockInfo.Length; i++)
             {
-                newSmallBlocks.Add(new smallBlock(bigBlockType, CreatedBlockInfo[i] + newSmallBlocks[0].pos));
+                newSmallBlocks.Add(new SmallBlock(bigBlockType, CreatedBlockInfo[i] + newSmallBlocks[0].pos));
             }
 
             // 碰撞判断
             for (int i = 0; i < newSmallBlocks.Count; i++)
             {
-                for (int j = 0; j < Map.walls.Count; j++)
+                for (int j = 0; j < map.walls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == Map.walls[j].pos.X &&
-                        newSmallBlocks[i].pos.Y == Map.walls[j].pos.Y) // 固定墙判断
+                    if (newSmallBlocks[i].pos.X == map.walls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == map.walls[j].pos.Y) // 固定墙判断
                     {
                         return;
                     }
                 }
 
-                for (int j = 0; j < Map.dynamicWalls.Count; j++)
+                for (int j = 0; j < map.dynamicWalls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == Map.dynamicWalls[j].pos.X &&
-                        newSmallBlocks[i].pos.Y == Map.dynamicWalls[j].pos.Y) // 动态墙判断
+                    if (newSmallBlocks[i].pos.X == map.dynamicWalls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == map.dynamicWalls[j].pos.Y) // 动态墙判断
                     {
                         return;
                     }
@@ -353,7 +370,7 @@ namespace Tetris
             smallBlocks = newSmallBlocks;
         }
 
-        public void Change(EDir sign)
+        public void Change(EDir sign, Map map)
         {
             // 预变形索引
             int newIndex = blockInfosIndex;
@@ -367,6 +384,7 @@ namespace Tetris
                     break;
             }
 
+            // 索引超界判断
             if (newIndex > smallBlockInfos.Count - 1)
             {
                 newIndex = 0;
@@ -377,7 +395,7 @@ namespace Tetris
             }
 
             Clear();
-            Create(newIndex); // 创建新方块
+            Create(newIndex, map); // 创建新方块
         }
 
         public void Clear()
@@ -403,9 +421,11 @@ namespace Tetris
     public class Worker : IDraw
     {
         public BigBlock block;
+        public Map map;
 
-        public Worker()
+        public Worker(Map map)
         {
+            this.map = map;
             NewBlock(); // 第一次初始化新方块
         }
 
@@ -414,7 +434,7 @@ namespace Tetris
             if (block != null)
                 block.Clear();
 
-            block = new BigBlock();
+            block = new BigBlock(map);
             Draw();
         }
 
@@ -422,7 +442,7 @@ namespace Tetris
         {
             if (block == null) return;
 
-            block.Change(sign);
+            block.Change(sign, map);
             Draw();
         }
 
@@ -430,7 +450,7 @@ namespace Tetris
         {
             if (Console.KeyAvailable)
             {
-                lock (GameScene.map)
+                lock (map)
                 {
                     switch (Console.ReadKey(true).Key)
                     {
@@ -457,7 +477,7 @@ namespace Tetris
 
         public void Move(EDir dir)
         {
-            List<smallBlock> newSmallBlocks = new List<smallBlock>();
+            List<SmallBlock> newSmallBlocks = new List<SmallBlock>();
             // 临时变量预移动
             int tempX = 0;
             int tempY = 0;
@@ -472,26 +492,26 @@ namespace Tetris
                 else
                     tempY += 1;
 
-                newSmallBlocks.Add(new smallBlock(block.smallBlocks[i].blockType,
+                newSmallBlocks.Add(new SmallBlock(block.smallBlocks[i].blockType,
                     new Position(tempX, tempY))); // 生成预移动的方块
             }
 
             // 碰撞判断
             for (int i = 0; i < newSmallBlocks.Count; i++)
             {
-                for (int j = 0; j < Map.walls.Count; j++)
+                for (int j = 0; j < map.walls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == Map.walls[j].pos.X &&
-                        newSmallBlocks[i].pos.Y == Map.walls[j].pos.Y) // 固定墙判断
+                    if (newSmallBlocks[i].pos.X == map.walls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == map.walls[j].pos.Y) // 固定墙判断
                     {
                         return;
                     }
                 }
 
-                for (int j = 0; j < Map.dynamicWalls.Count; j++)
+                for (int j = 0; j < map.dynamicWalls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == Map.dynamicWalls[j].pos.X &&
-                        newSmallBlocks[i].pos.Y == Map.dynamicWalls[j].pos.Y) // 动态墙判断
+                    if (newSmallBlocks[i].pos.X == map.dynamicWalls[j].pos.X &&
+                        newSmallBlocks[i].pos.Y == map.dynamicWalls[j].pos.Y) // 动态墙判断
                     {
                         return;
                     }
@@ -501,6 +521,28 @@ namespace Tetris
             block.Clear();
             block.smallBlocks = newSmallBlocks; // 预移动变成真实移动
             Draw();
+        }
+
+        public void FailingBottom(Map map)
+        {
+            for (int i = 0; i < block.smallBlocks.Count; i++)
+            {
+                if (block.smallBlocks[i].pos.Y == map.hight - 1)
+                {
+                    map.AddDynamicWalls(block.smallBlocks);
+                    NewBlock();
+                }
+
+                for (int j = 0; j < map.dynamicWalls.Count; j++)
+                {
+                    if (block.smallBlocks[i].pos.Y == map.dynamicWalls[j].pos.Y - 1 &&
+                        block.smallBlocks[i].pos.X == map.dynamicWalls[j].pos.X)
+                    {
+                        map.AddDynamicWalls(block.smallBlocks);
+                        NewBlock();
+                    }
+                }
+            }
         }
 
         public void Draw()
