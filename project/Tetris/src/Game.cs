@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Tetris
 {
@@ -32,22 +33,17 @@ namespace Tetris
     {
         private static int windowWide = 50;
         private static int windowHight = 30;
+
         public static int WindowWide
         {
-            get
-            {
-                return windowWide;
-            }
+            get { return windowWide; }
         }
 
         public static int WindowHight
         {
-            get
-            {
-                return windowHight;
-            }
+            get { return windowHight; }
         }
-        
+
         private static I_UpdateGameImage nowScene;
 
 
@@ -125,7 +121,7 @@ namespace Tetris
             Console.SetCursorPosition(w / 2 - title.Length, h / 4);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(title);
-            
+
             ConsoleColor firstSelectColor = ConsoleColor.Red;
             ConsoleColor secondSelectColor = ConsoleColor.White;
             // 处理选择
@@ -235,29 +231,38 @@ namespace Tetris
                 Environment.Exit(0);
             }
         }
-
-        
     }
 
     class GameScene : I_UpdateGameImage
     {
-        public Map map;
+        public static Map map;
         public Worker worker;
-        
+        public MoveTheard moveTheard = MoveTheard.Instance;
+
         public GameScene()
         {
             map = new Map();
             worker = new Worker();
+
+            // moveTheard.action += worker.MoveBlock; // 初始化按键线程
         }
+
         public void UpdateGameImage()
         {
             worker.NewBlock();
+            moveTheard.action += worker.MoveBlock; // 初始化按键线程
+            
+            
             while (true)
             {
-                map.Draw();
-                worker.Draw();
-                Console.ReadKey(true);
-                worker.ChangeBlock();
+                
+                lock (map)
+                {
+                    worker.Draw();
+                    map.Draw();
+                }
+                
+                
             }
             
         }

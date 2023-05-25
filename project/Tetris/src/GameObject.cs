@@ -227,13 +227,13 @@ namespace Tetris
                     blockInfos.Add(new[] { new Position(-2, 0), new Position(2, 0), new Position(4, 0) });
                     break;
                 case EBlockType.RStairs:
-                    blockInfos.Add(new[] { new Position(0, -1), new Position(-2, 0), new Position(-2, 1) });
+                    blockInfos.Add(new[] { new Position(0, -1), new Position(2, 0), new Position(2, 1) });
                     blockInfos.Add(new[] { new Position(2, 0), new Position(0, 1), new Position(-2, 1) });
                     blockInfos.Add(new[] { new Position(-2, -1), new Position(-2, 0), new Position(0, 1) });
                     blockInfos.Add(new[] { new Position(-2, 0), new Position(0, -1), new Position(2, -1) });
                     break;
                 case EBlockType.LStairs:
-                    blockInfos.Add(new[] { new Position(0, -1), new Position(0, 1), new Position(0, 2) });
+                    blockInfos.Add(new[] { new Position(0, -1), new Position(-2, 0), new Position(-2, 1) });
                     blockInfos.Add(new[] { new Position(-2, -1), new Position(0, -1), new Position(2, 0) });
                     blockInfos.Add(new[] { new Position(2, -1), new Position(2, 0), new Position(0, 1) });
                     blockInfos.Add(new[] { new Position(-2, 0), new Position(0, 1), new Position(2, 1) });
@@ -306,7 +306,7 @@ namespace Tetris
             }
         }
 
-        public void Change(ELeftOrRight sign = ELeftOrRight.Right)
+        public void Change(ELeftOrRight sign)
         {
             switch (sign)
             {
@@ -369,13 +369,37 @@ namespace Tetris
             block = new BigBlock();
         }
 
-        public void ChangeBlock()
+        public void ChangeBlock(ELeftOrRight sign)
         {
-            block.Change();
+            if (block == null)return;
+            
+            block.Change(sign);
         }
 
         public void MoveBlock()
         {
+            if (Console.KeyAvailable)
+            {
+                lock (GameScene.map)
+                {
+                    switch (Console.ReadKey(true).Key)
+                    {
+                        // QE旋转, S加速下降, AD左右移动
+                        case ConsoleKey.Q:
+                            ChangeBlock(ELeftOrRight.Left);
+                            break;
+                        case ConsoleKey.E:
+                            ChangeBlock(ELeftOrRight.Right);
+                            break;
+                        case ConsoleKey.S:
+                            break;
+                        case ConsoleKey.A:
+                            break;
+                        case ConsoleKey.D:
+                            break;
+                    }
+                }
+            }
         }
 
         public void Draw()
