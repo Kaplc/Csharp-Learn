@@ -32,7 +32,7 @@ namespace Tetris
     public class Game
     {
         private static int windowWide = 50;
-        private static int windowHight = 30;
+        private static int windowHight = 40;
 
         public static int WindowWide
         {
@@ -250,21 +250,20 @@ namespace Tetris
         public void UpdateGameImage()
         {
             worker.NewBlock();
-            moveTheard.action += worker.MoveBlock; // 初始化按键线程
-            
-            
+            moveTheard.action += worker.KeyCheck; // 初始化按键线程
+
             while (true)
             {
                 
                 lock (map)
                 {
-                    worker.Draw();
                     map.Draw();
+                    worker.Move(EDir.Down);
                 }
                 
                 
+                Thread.Sleep(100);
             }
-            
         }
     }
 }

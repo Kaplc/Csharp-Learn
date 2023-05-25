@@ -107,6 +107,10 @@ namespace Tetris
 
         public virtual void Draw()
         {
+            if (pos.Y < 0)
+            {
+                return;
+            }
             Console.SetCursorPosition(pos.X, pos.Y);
             ConsoleColor color = ConsoleColor.Red;
             switch (blockType)
@@ -276,6 +280,10 @@ namespace Tetris
 
         public void Clear()
         {
+            if (pos.Y<0)
+            {
+                return;
+            }
             Console.SetCursorPosition(pos.X, pos.Y);
             Console.Write("  ");
         }
@@ -298,9 +306,9 @@ namespace Tetris
             int BlockTypeIndex = r.Next(1, 8);
             bigBlockType = (EBlockType)BlockTypeIndex; // 初始化大方块类型
             smallBlockInfos = new BigBlockInfo(bigBlockType).blockInfos; // 下标获取枚举->获取某个类型的方块中包含小方块信息数组
-            
-            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2 + 1, 4))); // 初始化原点方块
-            
+
+            smallBlocks.Add(new smallBlock(bigBlockType, new Position(Game.WindowWide / 2 + 1, -4))); // 初始化原点方块
+
             // 随机生成方块变形
             blockInfosIndex = r.Next(0, smallBlockInfos.Count);
             Create(blockInfosIndex); // 创建剩余组成部分
@@ -311,12 +319,12 @@ namespace Tetris
             // 预创建
             List<smallBlock> newSmallBlocks = new List<smallBlock>();
             Position[] CreatedBlockInfo = smallBlockInfos[newIndex]; // 小方块信息数组中的其中一种变形
-            newSmallBlocks.Add(smallBlocks[0]); 
+            newSmallBlocks.Add(smallBlocks[0]);
             for (int i = 0; i < CreatedBlockInfo.Length; i++)
             {
                 newSmallBlocks.Add(new smallBlock(bigBlockType, CreatedBlockInfo[i] + newSmallBlocks[0].pos));
             }
-            
+
             // 碰撞判断
             for (int i = 0; i < newSmallBlocks.Count; i++)
             {
@@ -338,7 +346,7 @@ namespace Tetris
                     }
                 }
             }
-            
+
             // 真实创建
             blockInfosIndex = newIndex;
             smallBlocks.Clear();
@@ -407,6 +415,7 @@ namespace Tetris
                 block.Clear();
 
             block = new BigBlock();
+            Draw();
         }
 
         public void ChangeBlock(EDir sign)
@@ -414,9 +423,10 @@ namespace Tetris
             if (block == null) return;
 
             block.Change(sign);
+            Draw();
         }
 
-        public void MoveBlock()
+        public void KeyCheck()
         {
             if (Console.KeyAvailable)
             {
@@ -490,6 +500,7 @@ namespace Tetris
 
             block.Clear();
             block.smallBlocks = newSmallBlocks; // 预移动变成真实移动
+            Draw();
         }
 
         public void Draw()
