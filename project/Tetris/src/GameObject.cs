@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Tetris
 {
@@ -168,6 +169,10 @@ namespace Tetris
     {
         public int wide = Game.WindowWide - 2;
         public int hight = Game.WindowHight - 6;
+
+        public int[] count; // 每行的方块数量
+        public int score;
+
         public List<Wall> walls = new List<Wall>();
         public List<SmallBlock> dynamicWalls = new List<SmallBlock>();
 
@@ -184,6 +189,52 @@ namespace Tetris
             {
                 walls.Add(new Wall(0, y));
                 walls.Add(new Wall(wide, y));
+            }
+            
+        }
+
+        public void CalScore()
+        {
+            
+        }
+        public void ClearLine()
+        {
+            // 获取每行方块数量
+            count = new int[hight];
+            for (int i = 0; i < dynamicWalls.Count; i++)
+            {
+                count[dynamicWalls[i].pos.Y]++;
+            }
+            
+            // 临时List记录要删除的动态墙壁
+            List<SmallBlock> temp = new List<SmallBlock>();
+            for (int line = 0; line < count.Length; line++)
+            {
+                if (count[line] == wide / 2 - 1) // 行满
+                {
+                    foreach (var item in dynamicWalls) // 要删除对象添加进临时List
+                    {
+                        if (item.pos.Y == line)
+                        {
+                            temp.Add(item);
+                        }
+                    }
+
+                    foreach (var item in temp) // 移除
+                    {
+                        item.Clear(); // 移除前擦除旧位置
+                        dynamicWalls.Remove(item);
+                    }
+
+                    foreach (var item in dynamicWalls) // 移动消除行以上的方块
+                    {
+                        if (item.pos.Y < line)
+                        {
+                            item.Clear();
+                            item.pos.Y++;
+                        }
+                    }
+                }
             }
         }
 
@@ -229,7 +280,6 @@ namespace Tetris
     public class BigBlockInfo
     {
         // list索引代表该类型方块是哪个变形, Position数组代表最小单位方块的对原点相对坐标集合
-        // public List<Position[]> blockInfos = new List<Position[]>();
         public List<Position[]> blockInfos = new List<Position[]>();
 
         public BigBlockInfo(EBlockType type)
@@ -501,8 +551,10 @@ namespace Tetris
             {
                 for (int j = 0; j < map.walls.Count; j++)
                 {
-                    if (newSmallBlocks[i].pos.X == map.walls[j].pos.X &&
-                        newSmallBlocks[i].pos.Y == map.walls[j].pos.Y) // 固定墙判断
+                    if (newSmallBlocks[i].pos.X <= 0 ||
+                        newSmallBlocks[i].pos.X >= map.wide-1||
+                        newSmallBlocks[i].pos.Y >= map.hight
+                        ) // 固定墙判断
                     {
                         return;
                     }
@@ -531,6 +583,7 @@ namespace Tetris
                 {
                     map.AddDynamicWalls(block.smallBlocks);
                     NewBlock();
+                    return;
                 }
 
                 for (int j = 0; j < map.dynamicWalls.Count; j++)
@@ -540,6 +593,7 @@ namespace Tetris
                     {
                         map.AddDynamicWalls(block.smallBlocks);
                         NewBlock();
+                        return;
                     }
                 }
             }

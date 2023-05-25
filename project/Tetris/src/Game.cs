@@ -31,7 +31,7 @@ namespace Tetris
 
     public class Game
     {
-        private static int windowWide = 50;
+        private static int windowWide = 22;
         private static int windowHight = 35;
 
         public static int WindowWide
@@ -259,15 +259,15 @@ namespace Tetris
                     map.Draw();
                     worker.Move(EDir.Down);
                     worker.FailingBottom(map);
+                    if (map.GameOver())
+                    {
+                        Game.SceneChange(E_SceneType.End);
+                        moveTheard.action -= worker.KeyCheck;
+                        break;
+                    }
+                    map.ClearLine();
                 }
-                
-                if (map.GameOver())
-                {
-                    Game.SceneChange(E_SceneType.End);
-                    moveTheard.action -= worker.KeyCheck;
-                    break;
-                }
-                Thread.Sleep(50);
+                Thread.Sleep(10);
             }
         }
     }
