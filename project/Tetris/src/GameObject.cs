@@ -333,6 +333,37 @@ namespace Tetris
                     break;
             }
         }
+
+        /// <summary>
+        /// 声明索引器
+        /// </summary>
+        /// <param name="index"></param>
+        public Position[] this[int index]
+        {
+            get
+            {
+                // 超过索引情况
+                if (index < 0)
+                {
+                    index = blockInfos.Count - 1;
+                }
+                else if (index > blockInfos.Count - 1)
+                {
+                    index = 0;
+                }
+
+                return blockInfos[index];
+            }
+        }
+
+        /// <summary>
+        /// 返回变形种类
+        /// </summary>
+        /// <returns></returns>
+        public int Count
+        {
+            get => blockInfos.Count;
+        }
     }
 
     /// <summary>
@@ -364,22 +395,20 @@ namespace Tetris
     public class BigBlock : IDraw
     {
         public List<SmallBlock> smallBlocks = new List<SmallBlock>();
-        public List<Position[]> smallBlockInfos;
-        public EBlockType bigBlockType;
+        public BigBlockInfo info;
+        public EBlockType type;
         public int blockInfosIndex; // 当前变形索引
 
-        public BigBlock(Map map)
+        public BigBlock(Map map, EBlockType type, BigBlockInfo info)
         {
+            this.type = type;
+            this.info = info;
             Random r = new Random();
-            // 随机方块类型
-            int BlockTypeIndex = r.Next(1, 8);
-            bigBlockType = (EBlockType)BlockTypeIndex; // 初始化大方块类型
-            smallBlockInfos = new BigBlockInfo(bigBlockType).blockInfos; // 下标获取枚举->获取某个类型的方块中包含小方块信息数组
 
-            smallBlocks.Add(new SmallBlock(bigBlockType, new Position(Game.WindowWide / 2 - 1, -4))); // 初始化原点方块
+            smallBlocks.Add(new SmallBlock(type, new Position(Game.WindowWide / 2 - 1, -4))); // 初始化原点方块
 
             // 随机生成方块变形
-            blockInfosIndex = r.Next(0, smallBlockInfos.Count);
+            blockInfosIndex = r.Next(0, info.Count + 1);
             Create(blockInfosIndex, map); // 创建剩余组成部分
         }
 
@@ -387,11 +416,11 @@ namespace Tetris
         {
             // 预创建
             List<SmallBlock> newSmallBlocks = new List<SmallBlock>();
-            Position[] CreatedBlockInfo = smallBlockInfos[newIndex]; // 小方块信息数组中的其中一种变形
+            Position[] CreatedBlockInfo = info[newIndex]; // 获取方块信息数组中的其中一种变形
             newSmallBlocks.Add(smallBlocks[0]);
             for (int i = 0; i < CreatedBlockInfo.Length; i++)
             {
-                newSmallBlocks.Add(new SmallBlock(bigBlockType, CreatedBlockInfo[i] + newSmallBlocks[0].pos));
+                newSmallBlocks.Add(new SmallBlock(type, CreatedBlockInfo[i] + newSmallBlocks[0].pos));
             }
 
             // 碰撞判断
@@ -437,13 +466,13 @@ namespace Tetris
             }
 
             // 索引超界判断
-            if (newIndex > smallBlockInfos.Count - 1)
+            if (newIndex > info.Count - 1)
             {
                 newIndex = 0;
             }
             else if (newIndex < 0)
             {
-                newIndex = smallBlockInfos.Count - 1;
+                newIndex = info.Count - 1;
             }
 
             Clear();
@@ -474,9 +503,21 @@ namespace Tetris
     {
         public BigBlock block;
         public Map map;
+        public Dictionary<EBlockType, BigBlockInfo> infoDic; // 方块类型-方块信息字典
 
         public Worker(Map map)
         {
+            // 初始化字典
+            infoDic = new Dictionary<EBlockType, BigBlockInfo>()
+            {
+                { EBlockType.Square, new BigBlockInfo(EBlockType.Square) },
+                { EBlockType.Strip, new BigBlockInfo(EBlockType.Strip) },
+                { EBlockType.Tanker, new BigBlockInfo(EBlockType.Tanker) },
+                { EBlockType.RStairs, new BigBlockInfo(EBlockType.RStairs) },
+                { EBlockType.LStairs, new BigBlockInfo(EBlockType.LStairs) },
+                { EBlockType.LLongCrutch, new BigBlockInfo(EBlockType.LLongCrutch) },
+                { EBlockType.RLongCrutch, new BigBlockInfo(EBlockType.RLongCrutch) },
+            };
             this.map = map;
             NewBlock(); // 第一次初始化新方块
         }
@@ -486,7 +527,11 @@ namespace Tetris
             if (block != null)
                 block.Clear();
 
-            block = new BigBlock(map);
+            Random r = new Random();
+            // 随机方块类型
+            int BlockTypeIndex = r.Next(1, 8);
+
+            block = new BigBlock(map, (EBlockType)BlockTypeIndex, infoDic[(EBlockType)BlockTypeIndex]); // 初始化大方块类型
             Draw();
         }
 
@@ -549,6 +594,7 @@ namespace Tetris
                 {
                     return;
                 }
+
                 newSmallBlocks.Add(new SmallBlock(block.smallBlocks[i].blockType,
                     new Position(tempX, tempY))); // 生成预移动的方块
             }
