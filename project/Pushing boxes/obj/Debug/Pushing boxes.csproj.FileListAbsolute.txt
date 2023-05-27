@@ -1,0 +1,7 @@
+G:\project\Csharp-Learn\project\Pushing boxes\bin\Debug\Pushing_boxes.exe
+G:\project\Csharp-Learn\project\Pushing boxes\bin\Debug\Pushing_boxes.pdb
+G:\project\Csharp-Learn\project\Pushing boxes\obj\Debug\Pushing boxes.csproj.AssemblyReference.cache
+G:\project\Csharp-Learn\project\Pushing boxes\obj\Debug\Pushing boxes.csproj.SuggestedBindingRedirects.cache
+G:\project\Csharp-Learn\project\Pushing boxes\obj\Debug\Pushing boxes.csproj.CoreCompileInputs.cache
+G:\project\Csharp-Learn\project\Pushing boxes\obj\Debug\Pushing_boxes.exe
+G:\project\Csharp-Learn\project\Pushing boxes\obj\Debug\Pushing_boxes.pdb
