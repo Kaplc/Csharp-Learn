@@ -44,6 +44,16 @@ namespace Pushing_boxes
             this.x = x;
             this.y = y;
         }
+
+        public static bool operator ==(Position p1, Position p2)
+        {
+            return p1.x == p2.x && p1.y == p2.y;
+        }
+
+        public static bool operator !=(Position p1, Position p2)
+        {
+            return p1.x != p2.x && p1.y != p2.y;
+        }
     }
 
     #endregion
@@ -90,32 +100,27 @@ namespace Pushing_boxes
                     switch (Console.ReadKey(true).Key)
                     {
                         case ConsoleKey.W:
-                            player.Move(EMoveDir.UP);
+                            player.Move(EMoveDir.UP, this);
                             break;
                         case ConsoleKey.S:
-                            player.Move(EMoveDir.Down);
+                            player.Move(EMoveDir.Down, this);
                             break;
                         case ConsoleKey.A:
-                            player.Move(EMoveDir.Left);
+                            player.Move(EMoveDir.Left, this);
                             break;
                         case ConsoleKey.D:
-                            player.Move(EMoveDir.Right);
+                            player.Move(EMoveDir.Right, this);
                             break;
                         case ConsoleKey.Escape:
                             break;
                     }
                 }
             }
-            
         }
-        
+
         public void Draw()
         {
-            foreach (var item in walls)
-            {
-                item.Draw();
-            }
-
+            player.Draw();
             foreach (var item in boxes)
             {
                 item.Draw();
@@ -126,7 +131,10 @@ namespace Pushing_boxes
                 item.Draw();
             }
 
-            player.Draw();
+            foreach (var item in walls)
+            {
+                item.Draw();
+            }
         }
     }
 
@@ -159,6 +167,12 @@ namespace Pushing_boxes
                     break;
             }
         }
+
+        public void Clear()
+        {
+            Console.SetCursorPosition(pos.x, pos.y);
+            Console.Write("  ");
+        }
     }
 
     public class Player : GameObject
@@ -169,23 +183,56 @@ namespace Pushing_boxes
             this.type = type;
         }
 
-        public void Move(EMoveDir dir)
+
+        public void Move(EMoveDir dir, GameMap map)
         {
+            Clear();
             switch (dir)
             {
                 case EMoveDir.UP:
                     pos.y--;
+                    if (ColCheck(map)) // 先进行碰撞检测再确认移动
+                        pos.y++;
                     break;
                 case EMoveDir.Down:
                     pos.y++;
+                    if (ColCheck(map))
+                        pos.y--;
                     break;
                 case EMoveDir.Left:
                     pos.x -= 2;
+                    if (ColCheck(map))
+                        pos.x += 2;
                     break;
                 case EMoveDir.Right:
                     pos.x += 2;
+                    if (ColCheck(map))
+                        pos.x -= 2;
                     break;
             }
+        }
+
+        /// <summary>
+        /// 碰撞检测
+        /// </summary>
+        /// <returns></returns>
+        public bool ColCheck(GameMap map)
+        {
+            foreach (var item in map.walls)
+            {
+                if (this.pos == item.pos)
+                    return true; // true为有碰撞
+            }
+
+            foreach (var item in map.boxes)
+            {
+                if (this.pos == item.pos)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
