@@ -374,7 +374,7 @@ namespace Pushing_boxes
                 mapIndex.Add(new MapIndex((i + 1).ToString(), 13 + i * 4, 12));
             }
         }
-        
+
         public void UpdateGameImage()
         {
             Console.SetCursorPosition(Game.WindowWide / 2 - title.Length, 8);
@@ -416,6 +416,7 @@ namespace Pushing_boxes
                         {
                             currMapIndex = mapIndex.Count - 1;
                         }
+
                         break;
                     case ConsoleKey.J:
                         Game.SceneChange(E_SceneType.Game);
@@ -448,10 +449,7 @@ namespace Pushing_boxes
                 Environment.Exit(0);
             }
         }
-
-        public override void UpdateGameImage()
-        {
-        }
+        
     }
 
     /// <summary>
@@ -459,13 +457,19 @@ namespace Pushing_boxes
     /// </summary>
     public class GameScene : I_UpdateGameImage
     {
+        public int mapIndex = SelectMap.currMapIndex;
+        public GameMap map;
+
         public GameScene()
         {
-            
+            map = new GameMap(mapIndex);
         }
-        
+
         public void UpdateGameImage()
         {
+            map.Draw();
         }
     }
+
+    
 }

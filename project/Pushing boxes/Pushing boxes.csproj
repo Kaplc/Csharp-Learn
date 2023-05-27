@@ -42,7 +42,7 @@
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="src\Game.cs" />
-        <Compile Include="src\GameMap.cs" />
+        <Compile Include="src\GameMapInfo.cs" />
         <Compile Include="src\GameObject.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
