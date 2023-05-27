@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Pushing_boxes
 {
@@ -459,17 +460,59 @@ namespace Pushing_boxes
     {
         public int mapIndex = SelectMap.currMapIndex;
         public GameMap map;
+        public MoveThread moveThread = MoveThread.Instance;
 
         public GameScene()
         {
             map = new GameMap(mapIndex);
+            moveThread.ac += map.CheckKeyBroad; // 添加输入线程
         }
 
         public void UpdateGameImage()
         {
-            map.Draw();
+            while (true)
+            {
+                lock (map)
+                {
+                    map.Draw();
+                }
+            }
+
         }
     }
+    
+    /// <summary>
+    /// 输入线程
+    /// </summary>
+    public class MoveThread
+    {
+        private Thread t;
+        public Action ac;
+        
+        private static MoveThread instance = new MoveThread();
 
+        public static MoveThread Instance
+        {
+            get => instance;
+        }
+
+        private MoveThread()
+        {
+            t = new Thread(Strat);
+            t.Start();
+        }
+
+        public void Strat()
+        {
+            while (true)
+            {
+                if (ac== null)
+                {
+                    continue;
+                }
+                ac.Invoke();
+            }
+        }
+    }
     
 }

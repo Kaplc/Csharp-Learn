@@ -66,7 +66,7 @@ namespace Pushing_boxes
                 {
                     walls.Add(new Position(oX + 0, oY + y));
                     walls.Add(new Position(oX + 2 * 7, oY + y));
-                    continue;
+                    
                 }
                 else if (y == 4)
                 {

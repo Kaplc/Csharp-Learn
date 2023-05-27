@@ -13,6 +13,14 @@ namespace Pushing_boxes
         Star
     }
 
+    public enum EMoveDir
+    {
+        UP,
+        Down,
+        Left,
+        Right
+    }
+
     #endregion
 
     #region 接口
@@ -59,10 +67,12 @@ namespace Pushing_boxes
             {
                 walls.Add(new Wall(EType.Wall, item));
             }
+
             foreach (var item in mapInfo.boxes)
             {
                 boxes.Add(new Box(EType.Box, item));
             }
+
             foreach (var item in mapInfo.stars)
             {
                 stars.Add(new Star(EType.Star, item));
@@ -71,20 +81,51 @@ namespace Pushing_boxes
             player = new Player(EType.Player, mapInfo.player);
         }
 
+        public void CheckKeyBroad()
+        {
+            if (Console.KeyAvailable)
+            {
+                lock (this)
+                {
+                    switch (Console.ReadKey(true).Key)
+                    {
+                        case ConsoleKey.W:
+                            player.Move(EMoveDir.UP);
+                            break;
+                        case ConsoleKey.S:
+                            player.Move(EMoveDir.Down);
+                            break;
+                        case ConsoleKey.A:
+                            player.Move(EMoveDir.Left);
+                            break;
+                        case ConsoleKey.D:
+                            player.Move(EMoveDir.Right);
+                            break;
+                        case ConsoleKey.Escape:
+                            break;
+                    }
+                }
+            }
+            
+        }
+        
         public void Draw()
         {
             foreach (var item in walls)
             {
                 item.Draw();
             }
+
             foreach (var item in boxes)
             {
                 item.Draw();
             }
+
             foreach (var item in stars)
             {
                 item.Draw();
             }
+
             player.Draw();
         }
     }
@@ -93,8 +134,8 @@ namespace Pushing_boxes
     {
         public Position pos;
         public EType type;
-        
-        
+
+
         public virtual void Draw()
         {
             Console.SetCursorPosition(pos.x, pos.y);
@@ -116,20 +157,36 @@ namespace Pushing_boxes
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("■");
                     break;
-                
             }
         }
     }
 
     public class Player : GameObject
     {
-        
         public Player(EType type, Position pos)
         {
             this.pos = pos;
             this.type = type;
         }
-        
+
+        public void Move(EMoveDir dir)
+        {
+            switch (dir)
+            {
+                case EMoveDir.UP:
+                    pos.y--;
+                    break;
+                case EMoveDir.Down:
+                    pos.y++;
+                    break;
+                case EMoveDir.Left:
+                    pos.x -= 2;
+                    break;
+                case EMoveDir.Right:
+                    pos.x += 2;
+                    break;
+            }
+        }
     }
 
     public class Wall : GameObject
@@ -139,7 +196,6 @@ namespace Pushing_boxes
             this.pos = pos;
             this.type = type;
         }
-        
     }
 
     public class Box : GameObject
@@ -149,7 +205,6 @@ namespace Pushing_boxes
             this.pos = pos;
             this.type = type;
         }
-        
     }
 
     public class Star : GameObject
@@ -159,6 +214,5 @@ namespace Pushing_boxes
             this.pos = pos;
             this.type = type;
         }
-        
     }
 }
