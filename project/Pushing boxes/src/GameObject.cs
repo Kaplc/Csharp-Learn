@@ -68,10 +68,12 @@ namespace Pushing_boxes
         public List<Star> stars = new List<Star>();
         public List<Box> boxes = new List<Box>();
         public MapInfo mapInfo;
+        public bool reStart = false;
+        public bool back = false;
 
         public GameMap(int index)
         {
-            mapInfo = new MapInfos()[index]; // 取出第一个地图信息
+            mapInfo = MapInfos.infos[index]; // 取出第一个地图信息
             // 加载信息
             foreach (var wall in mapInfo.walls)
             {
@@ -112,7 +114,11 @@ namespace Pushing_boxes
                         case ConsoleKey.D:
                             player.Move(EMoveDir.Right, this);
                             break;
+                        case ConsoleKey.N:
+                            reStart = true;
+                            break;
                         case ConsoleKey.Escape:
+                            back = true;
                             break;
                     }
                 }
@@ -121,6 +127,7 @@ namespace Pushing_boxes
 
         public bool GameOver()
         {
+            
             foreach (var star in stars)
             {
                 star.CheckPress(this);
@@ -135,19 +142,20 @@ namespace Pushing_boxes
                 }
             }
 
-            if (showCount==0)
+            if (showCount == 0)
             {
                 return true;
             }
 
             return false;
         }
-        
+
         public void Draw()
         {
             player.Draw();
             foreach (var item in boxes)
             {
+                item.CheckPress(this);
                 item.Draw();
             }
 
@@ -254,22 +262,26 @@ namespace Pushing_boxes
             switch (dir)
             {
                 case EMoveDir.UP:
-                    var upRes = CheckBoxNear(EMoveDir.UP, map);
+                    var upRes = CheckBoxNear(EMoveDir.UP, map); // 检测是否在箱子旁边并且合法方向推动
                     isBox = upRes.Item1;
                     box = upRes.Item2;
-                    if (isBox)
+                    if (isBox) // 方向合法
                     {
                         if (box.Move(EMoveDir.UP, map))
                         {
+                            // 移动箱子成功
+                            // 人也移动
                             pos.y--;
                             if (ColCheck(map)) // 先进行碰撞检测再确认移动
                                 pos.y++;
                         }
+                        // 箱子移动失败不做操作
                     }
-                    else
+                    else // 旁边无箱子或移动方向非法
                     {
+                        // 移动人
                         pos.y--;
-                        if (ColCheck(map)) // 先进行碰撞检测再确认移动
+                        if (ColCheck(map)) 
                             pos.y++;
                     }
 
@@ -358,6 +370,7 @@ namespace Pushing_boxes
         public Position left;
         public Position right;
         public int index; // 箱子编号
+        public bool press = false;
 
         public Box(EType type, Position pos, int index)
         {
@@ -458,6 +471,35 @@ namespace Pushing_boxes
 
             return false;
         }
+
+        public void CheckPress(GameMap map)
+        {
+            foreach (var star in map.stars)
+            {
+                if (star.pos == pos) // 相等就打标识绿色
+                {
+                    press = true;
+                    return; // 直接返回不需要继续判断
+                }
+            }
+
+            press = false; // 都不相等就红色
+        }
+
+        public override void Draw()
+        {
+            Console.SetCursorPosition(pos.x, pos.y);
+            if (press)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            Console.Write("■");
+        }
     }
 
     public class Star : GameObject
@@ -476,7 +518,7 @@ namespace Pushing_boxes
         {
             foreach (var box in map.boxes)
             {
-                if (box.pos == pos) // 相等就打标识禁止显示
+                if (box.pos == pos || map.player.pos == pos) // 与人位置或箱子相等就打标识禁止显示
                 {
                     show = false;
                     return; // 直接返回不需要继续判断
@@ -484,7 +526,6 @@ namespace Pushing_boxes
             }
 
             show = true; // 都不相等就显示
-            
         }
 
         public override void Draw()

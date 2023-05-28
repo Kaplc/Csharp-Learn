@@ -8,12 +8,12 @@ namespace Pushing_boxes
     /// </summary>
     public class MapInfos
     {
-        public List<MapInfo> infos = new List<MapInfo>();
+        public static List<MapInfo> infos = new List<MapInfo>();
 
         public MapInfos()
         {
             infos.Add(new MapInfo(1));
-            infos.Add(new MapInfo(2));
+            // infos.Add(new MapInfo(2));
         }
 
         public MapInfo this[int index]

@@ -35,6 +35,7 @@ namespace Pushing_boxes
     {
         private static int windowWide = 42;
         private static int windowHight = 30;
+        public static MapInfos mapInfos;
 
         public static int WindowWide
         {
@@ -51,6 +52,7 @@ namespace Pushing_boxes
 
         public Game()
         {
+            mapInfos = new MapInfos();
             SceneChange(E_SceneType.Start);
             InitConsole();
         }
@@ -123,7 +125,7 @@ namespace Pushing_boxes
 
         public virtual void UpdateGameImage()
         {
-            Console.SetCursorPosition(w / 2 + 1 - title.Length, h / 4);
+            Console.SetCursorPosition(w / 2  - title.Length, h / 4);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(title);
 
@@ -359,7 +361,7 @@ namespace Pushing_boxes
 
         public SelectMap()
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < MapInfos.infos.Count; i++)
             {
                 mapIndex.Add(new MapIndex((i + 1).ToString(), 13 + i * 4, 12));
             }
@@ -423,7 +425,7 @@ namespace Pushing_boxes
     {
         public EndScene()
         {
-            title = "游戏结束";
+            title = "成功通关";
             firstSelect = "返回菜单";
             secondSelect = "退出游戏";
         }
@@ -459,6 +461,13 @@ namespace Pushing_boxes
 
         public void UpdateGameImage()
         {
+            Console.SetCursorPosition(16, Game.WindowHight-8);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("WASD:控制方向 ");
+            Console.SetCursorPosition(10, Game.WindowHight-6);
+            Console.WriteLine("N:重新开始, ESC: 返回主菜单");
+
+
             while (true)
             {
                 lock (map)
@@ -466,12 +475,30 @@ namespace Pushing_boxes
                     map.Draw();
                     if (map.GameOver())
                     {
-                        Game.SceneChange(E_SceneType.End);
+                        SelectMap.currMapIndex++;
+                        if (SelectMap.currMapIndex>MapInfos.infos.Count-1)
+                        {
+                            Game.SceneChange(E_SceneType.End);
+                            break;
+                        }
+                        Game.SceneChange(E_SceneType.Game);
+                        break;
+                    }
+
+                    if (map.reStart)
+                    {
+                        Game.SceneChange(E_SceneType.Game);
+                        break;
+                    }
+
+                    if (map.back)
+                    {
+                        Game.SceneChange(E_SceneType.Start);
                         break;
                     }
                 }
             }
-
+            moveThread.ac -= map.CheckKeyBroad; // 关闭输入线程
         }
     }
     
