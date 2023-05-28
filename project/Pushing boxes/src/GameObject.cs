@@ -64,9 +64,9 @@ namespace Pushing_boxes
     public class GameMap
     {
         public Player player;
-        public static List<Wall> walls = new List<Wall>();
-        public static List<Star> stars = new List<Star>();
-        public static List<Box> boxes = new List<Box>();
+        public List<Wall> walls = new List<Wall>();
+        public List<Star> stars = new List<Star>();
+        public List<Box> boxes = new List<Box>();
         public MapInfo mapInfo;
 
         public GameMap(int index)
@@ -119,6 +119,30 @@ namespace Pushing_boxes
             }
         }
 
+        public bool GameOver()
+        {
+            foreach (var star in stars)
+            {
+                star.CheckPress(this);
+            }
+
+            int showCount = 3;
+            foreach (var star in stars)
+            {
+                if (!star.show)
+                {
+                    showCount--;
+                }
+            }
+
+            if (showCount==0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        
         public void Draw()
         {
             player.Draw();
@@ -159,7 +183,6 @@ namespace Pushing_boxes
                     Console.Write("■");
                     break;
                 case EType.Star:
-                    
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write("★");
                     break;
@@ -185,10 +208,14 @@ namespace Pushing_boxes
             this.type = type;
         }
 
-        private (bool, Box) CheckBoxNear(EMoveDir dir)
+        /// <summary>
+        /// 检测是否在箱子旁边
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <returns></returns>
+        private (bool, Box) CheckBoxNear(EMoveDir dir, GameMap map)
         {
-
-            foreach (var box in GameMap.boxes)
+            foreach (var box in map.boxes)
             {
                 if (this.pos == box.up && dir == EMoveDir.Down)
                     return (true, box);
@@ -207,29 +234,27 @@ namespace Pushing_boxes
         /// 碰撞检测
         /// </summary>
         /// <returns></returns>
-        private bool ColCheck()
+        private bool ColCheck(GameMap map)
         {
-            foreach (var item in GameMap.walls)
+            foreach (var item in map.walls)
             {
                 if (this.pos == item.pos)
                     return true; // true为有碰撞
             }
-
 
             return false;
         }
 
         public void Move(EMoveDir dir, GameMap map)
         {
-            
             bool isBox;
             Box box;
-            
+
             Clear();
             switch (dir)
             {
                 case EMoveDir.UP:
-                    var upRes = CheckBoxNear(EMoveDir.UP);
+                    var upRes = CheckBoxNear(EMoveDir.UP, map);
                     isBox = upRes.Item1;
                     box = upRes.Item2;
                     if (isBox)
@@ -237,20 +262,20 @@ namespace Pushing_boxes
                         if (box.Move(EMoveDir.UP, map))
                         {
                             pos.y--;
-                            if (ColCheck()) // 先进行碰撞检测再确认移动
+                            if (ColCheck(map)) // 先进行碰撞检测再确认移动
                                 pos.y++;
                         }
                     }
                     else
                     {
                         pos.y--;
-                        if (ColCheck()) // 先进行碰撞检测再确认移动
+                        if (ColCheck(map)) // 先进行碰撞检测再确认移动
                             pos.y++;
                     }
 
                     break;
                 case EMoveDir.Down:
-                    var downRes = CheckBoxNear(EMoveDir.Down);
+                    var downRes = CheckBoxNear(EMoveDir.Down, map);
                     isBox = downRes.Item1;
                     box = downRes.Item2;
                     if (isBox)
@@ -258,20 +283,20 @@ namespace Pushing_boxes
                         if (box.Move(EMoveDir.Down, map))
                         {
                             pos.y++;
-                            if (ColCheck())
+                            if (ColCheck(map))
                                 pos.y--;
                         }
                     }
                     else
                     {
                         pos.y++;
-                        if (ColCheck())
+                        if (ColCheck(map))
                             pos.y--;
                     }
 
                     break;
                 case EMoveDir.Left:
-                    var LeftRes = CheckBoxNear(EMoveDir.Left);
+                    var LeftRes = CheckBoxNear(EMoveDir.Left, map);
                     isBox = LeftRes.Item1;
                     box = LeftRes.Item2;
                     if (isBox)
@@ -279,20 +304,20 @@ namespace Pushing_boxes
                         if (box.Move(EMoveDir.Left, map))
                         {
                             pos.x -= 2;
-                            if (ColCheck())
+                            if (ColCheck(map))
                                 pos.x += 2;
                         }
                     }
                     else
                     {
                         pos.x -= 2;
-                        if (ColCheck())
+                        if (ColCheck(map))
                             pos.x += 2;
                     }
 
                     break;
                 case EMoveDir.Right:
-                    var rightRes = CheckBoxNear(EMoveDir.Right);
+                    var rightRes = CheckBoxNear(EMoveDir.Right, map);
                     isBox = rightRes.Item1;
                     box = rightRes.Item2;
                     if (isBox)
@@ -300,20 +325,19 @@ namespace Pushing_boxes
                         if (box.Move(EMoveDir.Right, map))
                         {
                             pos.x += 2;
-                            if (ColCheck())
+                            if (ColCheck(map))
                                 pos.x -= 2;
                         }
                     }
                     else
                     {
                         pos.x += 2;
-                        if (ColCheck())
+                        if (ColCheck(map))
                             pos.x -= 2;
                     }
 
                     break;
             }
-            
         }
     }
 
@@ -333,7 +357,7 @@ namespace Pushing_boxes
         public Position down;
         public Position left;
         public Position right;
-        public int index;
+        public int index; // 箱子编号
 
         public Box(EType type, Position pos, int index)
         {
@@ -351,16 +375,17 @@ namespace Pushing_boxes
         /// 碰撞检测
         /// </summary>
         /// <returns></returns>
-        private bool ColCheck()
+        private bool ColCheck(GameMap map)
         {
             // 禁止撞墙
-            foreach (var wall in GameMap.walls)
+            foreach (var wall in map.walls)
             {
                 if (this.pos == wall.pos)
                     return true; // true为有碰撞
             }
+
             // 禁止两个箱子移动
-            foreach (var box in GameMap.boxes)
+            foreach (var box in map.boxes)
             {
                 if (box.index == this.index)
                 {
@@ -391,7 +416,7 @@ namespace Pushing_boxes
             {
                 case EMoveDir.UP:
                     pos.y--;
-                    if (ColCheck()) // true为禁止碰撞归位
+                    if (ColCheck(map)) // true为禁止碰撞归位
                     {
                         pos.y++;
                         return false; // 返回移动失败
@@ -401,7 +426,7 @@ namespace Pushing_boxes
                     return true;
                 case EMoveDir.Down:
                     pos.y++;
-                    if (ColCheck()) // true为禁止碰撞归位
+                    if (ColCheck(map)) // true为禁止碰撞归位
                     {
                         pos.y--;
                         return false; // 返回移动失败
@@ -411,7 +436,7 @@ namespace Pushing_boxes
                     return true;
                 case EMoveDir.Left:
                     pos.x -= 2;
-                    if (ColCheck()) // true为禁止碰撞归位
+                    if (ColCheck(map)) // true为禁止碰撞归位
                     {
                         pos.x += 2;
                         return false; // 返回移动失败
@@ -421,7 +446,7 @@ namespace Pushing_boxes
                     return true;
                 case EMoveDir.Right:
                     pos.x += 2;
-                    if (ColCheck()) // true为禁止碰撞归位
+                    if (ColCheck(map)) // true为禁止碰撞归位
                     {
                         pos.x -= 2;
                         return false; // 返回移动失败
@@ -438,11 +463,38 @@ namespace Pushing_boxes
     public class Star : GameObject
     {
         public bool show;
+        public int boxIndex = -1;
+
         public Star(EType type, Position pos)
         {
             this.show = true;
             this.pos = pos;
             this.type = type;
+        }
+
+        public void CheckPress(GameMap map)
+        {
+            foreach (var box in map.boxes)
+            {
+                if (box.pos == pos) // 相等就打标识禁止显示
+                {
+                    show = false;
+                    return; // 直接返回不需要继续判断
+                }
+            }
+
+            show = true; // 都不相等就显示
+            
+        }
+
+        public override void Draw()
+        {
+            if (show)
+            {
+                Console.SetCursorPosition(pos.x, pos.y);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("★");
+            }
         }
     }
 }

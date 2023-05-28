@@ -464,6 +464,11 @@ namespace Pushing_boxes
                 lock (map)
                 {
                     map.Draw();
+                    if (map.GameOver())
+                    {
+                        Game.SceneChange(E_SceneType.End);
+                        break;
+                    }
                 }
             }
 
