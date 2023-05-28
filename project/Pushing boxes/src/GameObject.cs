@@ -73,7 +73,7 @@ namespace Pushing_boxes
 
         public GameMap(int index)
         {
-            mapInfo = MapInfos.infos[index]; // 取出第一个地图信息
+            mapInfo = index > MapInfos.infos.Count - 1 ? MapInfos.infos[MapInfos.infos.Count - 1] : MapInfos.infos[index]; // 取出地图信息
             // 加载信息
             foreach (var wall in mapInfo.walls)
             {
@@ -133,7 +133,7 @@ namespace Pushing_boxes
                 star.CheckPress(this);
             }
 
-            int showCount = 3;
+            int showCount = stars.Count;
             foreach (var star in stars)
             {
                 if (!star.show)

@@ -478,6 +478,7 @@ namespace Pushing_boxes
                         SelectMap.currMapIndex++;
                         if (SelectMap.currMapIndex>MapInfos.infos.Count-1)
                         {
+                            SelectMap.currMapIndex--;
                             Game.SceneChange(E_SceneType.End);
                             break;
                         }

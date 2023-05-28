@@ -13,7 +13,7 @@ namespace Pushing_boxes
         public MapInfos()
         {
             infos.Add(new MapInfo(1));
-            // infos.Add(new MapInfo(2));
+            infos.Add(new MapInfo(2));
         }
 
         public MapInfo this[int index]
@@ -45,7 +45,7 @@ namespace Pushing_boxes
         public void Create1()
         {
             // 地图原点
-            int oX = Game.WindowWide / 3 + 1;
+            int oX = Game.WindowWide / 5 + 1;
             int oY = Game.WindowHight / 3;
 
             #region 边界墙
@@ -66,7 +66,6 @@ namespace Pushing_boxes
                 {
                     walls.Add(new Position(oX + 0, oY + y));
                     walls.Add(new Position(oX + 2 * 7, oY + y));
-                    
                 }
                 else if (y == 4)
                 {
@@ -124,6 +123,93 @@ namespace Pushing_boxes
 
         public void Create2()
         {
+            // 地图原点
+            int oX = Game.WindowWide / 3 + 1;
+            int oY = Game.WindowHight / 3;
+
+            #region 边界墙
+
+            for (int x = 0; x < 10; x++)
+            {
+                if (x <= 8)
+                {
+                    walls.Add(new Position(oX + x * 2, oY + 0));
+                }
+
+                if (x >= 3 && x <= 9)
+                {
+                    walls.Add(new Position(oX + x * 2, oY + 7));
+                }
+            }
+
+            for (int y = 0; y < 7; y++)
+            {
+                switch (y)
+                {
+                    case 1:
+                        walls.Add(new Position(oX + 0 * 2, oY + y));
+                        walls.Add(new Position(oX + 8 * 2, oY + y));
+                        break;
+                    case 2:
+                        walls.Add(new Position(oX + 0 * 2, oY + y));
+                        walls.Add(new Position(oX + 1 * 2, oY + y));
+                        walls.Add(new Position(oX + 2 * 2, oY + y));
+                        walls.Add(new Position(oX + 6 * 2, oY + y));
+                        walls.Add(new Position(oX + 8 * 2, oY + y));
+                        walls.Add(new Position(oX + 9 * 2, oY + y));
+                        break;
+                    case 3:
+                        walls.Add(new Position(oX + 2 * 2, oY + y));
+                        walls.Add(new Position(oX + 5 * 2, oY + y));
+                        walls.Add(new Position(oX + 6 * 2, oY + y));
+                        walls.Add(new Position(oX + 9 * 2, oY + y));
+                        break;
+                    case 4:
+                        walls.Add(new Position(oX + 2 * 2, oY + y));
+                        walls.Add(new Position(oX + 9 * 2, oY + y));
+                        break;
+                    case 5:
+                        walls.Add(new Position(oX + 2 * 2, oY + y));
+                        walls.Add(new Position(oX + 6 * 2, oY + y));
+                        walls.Add(new Position(oX + 9 * 2, oY + y));
+                        break;
+                    case 6:
+                        walls.Add(new Position(oX + 2 * 2, oY + y));
+                        walls.Add(new Position(oX + 3 * 2, oY + y));
+                        walls.Add(new Position(oX + 6 * 2, oY + y));
+                        walls.Add(new Position(oX + 9 * 2, oY + y));
+                        break;
+                }
+            }
+
+            #endregion
+            
+
+            #region 人物
+
+            player = new Position(oX + 8 * 2, oY + 6);
+
+            #endregion
+
+            #region 箱子
+
+            boxes.Add(new Position(oX + 4 * 2, oY + 2));
+            boxes.Add(new Position(oX + 4 * 2, oY + 3));
+            boxes.Add(new Position(oX + 3 * 2, oY + 4));
+            boxes.Add(new Position(oX + 5 * 2, oY + 4));
+            boxes.Add(new Position(oX + 7 * 2, oY + 4));
+
+            #endregion
+
+            #region 星星
+
+            stars.Add(new Position(oX + 1 * 2, oY + 1));
+            stars.Add(new Position(oX + 2 * 2, oY + 1));
+            stars.Add(new Position(oX + 3 * 2, oY + 1));
+            stars.Add(new Position(oX + 4 * 2, oY + 1));
+            stars.Add(new Position(oX + 5 * 2, oY + 1));
+
+            #endregion
         }
     }
 }
